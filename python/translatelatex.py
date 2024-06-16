@@ -106,8 +106,7 @@ class LaTeX2CalcEngine:
             "\\cup": "∪",
         }
 
-        self.greek_letters = {
-            '\\O': 'Otso Veisterä',            
+        self.greek_letters = {            
             '\\Alpha': 'Α',
             '\\Beta': 'Β',
             '\\Gamma': 'Γ',
@@ -138,6 +137,8 @@ class LaTeX2CalcEngine:
             '\\delta': 'δ',
             '\\epsilon': 'ε',
             '\\varepsilon': 'ε',
+            '\\O': 'Otso Veisterä',
+            '\\upsilon': 'υ',
             '\\zeta': 'ζ',
             '\\eta': 'η',
             '\\theta': 'θ',
@@ -152,7 +153,6 @@ class LaTeX2CalcEngine:
             '\\rho': 'ρ',
             '\\sigma': 'σ',
             '\\tau': 'τ',
-            '\\upsilon': 'υ',
             '\\phi': 'φ',
             '\\varphi': 'φ',
             '\\chi': 'χ',
@@ -488,7 +488,7 @@ class LaTeX2CalcEngine:
         for i in range(expression.count("\\mathrm")):
             match = re.search(r'\\mathrm\£(\d+)\£\{(.+)\}\£\1\£', expression)
             if match:
-                tag = "£" + match.group(1) + "£" # jos lisää "\" ton eteen -> kaatuu \mathrm{\sin \left(3\ \frac{\text{kJ}}{\text{kg}\cdot \text{K}}\right)}-\mathrm{\text{kJ}}
+                tag = "£" + match.group(1) + "£" # \mathrm{\sin \left(3\ \frac{\text{kJ}}{\text{kg}\cdot \text{K}}\right)}-\mathrm{\text{kJ}}
                 text_containing_units = match.group(2)
                 if self.TI_on:
                     old_text_containing_units = text_containing_units
@@ -1173,17 +1173,29 @@ class LaTeX2CalcEngine:
         return expression
 
     def translateSystem(self, expression):
+
         if "\\begin" in expression:
             expression = expression.replace("end", "enj")
-            matches = re.findall(r'\\begin\£([0-9]+)\£\{cases\}\£\1\£', expression)
-            for match in matches:
-                expression = expression.replace("\\begin£" + match + "£{cases}£" + match + "£", "system(")
-                
-            matches = re.findall(r'&([^\\]*)\\enj\£([0-9]+)\£\{cases\}\£\2\£', expression)
-            for match in matches:
-                expression = expression.replace("&" + match[0] + "\\enj£" + match[1] + "£{cases}£" + match[1] + "£", " " + match[0] + ")")
+            
+            # Replace \\begin£<number>£{cases}£<number>£ with system(
+            expression = re.sub(r'\\begin£([0-9]+)£\{cases\}£\1£', r'system(', expression)
 
-        expression = re.sub(r'&([^\\]*)\\', r' \1,', expression)
+            # Replace &<content>\\enj£<number>£{cases}£<number>£ with <content>)
+            expression = re.sub(r'&([^\\]*)\\enj£([0-9]+)£\{cases\}£\2£', r' \1)', expression)
+
+            # Handle cases without &
+            expression = re.sub(r'\\enj£([0-9]+)£\{cases\}£\1£', r')', expression)
+
+            # Replace &<content>\\ with <content>, 
+            expression = re.sub(r'&([^\\]*)\\\\', r' \1,', expression)
+            
+            # Replace <content>\\ with <content>, for cases without &
+            if '&' not in expression:
+                expression = re.sub(r'([^&\\]+)\\\\', r'\1,', expression)
+
+
+
+
         return expression
 
     # OPTIMIZE
@@ -1585,16 +1597,45 @@ def translate(expression, TI_on=True, SC_on=False, constants_on=False, coulomb_o
     expression = expression.replace("\\", "").replace("{", "(").replace("}", ")")
     
 
-    # paranna TÄÄ
-    def replace_coefficient(match):
+
+
+    # Define characters to permute
+    characters = ['x', 'y', 'z', 'a', 'b', 'c', 'k']
+
+    # Create regex pattern for permutations of characters
+    pattern_xyzabc = re.compile(fr'({"|".join(characters)})+')
+
+    #Remove empty strings before joining with '*'
+    def multiplyVariables(match):
+        return '*'.join(filter(None, match.group(0)))
+
+    # Apply the replacement function to the expression
+    expression = pattern_xyzabc.sub(multiplyVariables, expression)
+
+
+
+
+    def replaceMultiplier(match):
         return match.group(1) + "*("
 
-    def replace_multiplicand(match):
+    def replaceMultiplicand(match):
         return ")*" + match.group(1)
+    
 
-    expression = re.sub(r'([\@\;\:\.\,α-ωΑ-Ωa-zA-Z0-9°₀₁₂₃₄₅₆₇₈₉]+)\(', replace_coefficient, expression)
-    expression = re.sub(r'\)([\@\;\:\.\,α-ωΑ-Ωa-zA-Z0-9°₀₁₂₃₄₅₆₇₈₉]+)', replace_multiplicand, expression)
 
+    ## Add multiplication sign between non-number and number characters
+    def addMultiplicationSign(match):
+      return match.group(1) + "*" + match.group(2)
+  
+    # non-number characters followed by a number 
+    expression = re.sub(r'([@\;\:\.\,α-ωΑ-Ωa-zA-Z°₀₁₂₃₄₅₆₇₈₉]+)([0-9]+)', addMultiplicationSign, expression)
+    # number followed by a sequence of non-number characters 
+    
+    
+    expression = re.sub(r'([0-9]+)([@\;\:\.\,α-ωΑ-Ωa-zA-Z°₀₁₂₃₄₅₆₇₈₉]+)', addMultiplicationSign, expression)
+    # sulkujen kertominen
+    expression = re.sub(r'([\@\;\:\.\,α-ωΑ-Ωa-zA-Z0-9°₀₁₂₃₄₅₆₇₈₉]+)\(', replaceMultiplier, expression)
+    expression = re.sub(r'\)([\@\;\:\.\,α-ωΑ-Ωa-zA-Z0-9°₀₁₂₃₄₅₆₇₈₉]+)', replaceMultiplicand, expression)
     # fixlist 
     for fix in engine.fixlist:
         expression = expression.replace(fix + "*", fix)
@@ -1612,7 +1653,9 @@ def translate(expression, TI_on=True, SC_on=False, constants_on=False, coulomb_o
     "__": "_",
     ",*": ",",
     ".*": ".",
-    "*@r": "@r"
+    "*@r": "@r",
+    "(*": "(",
+    "*)": ")"
     }
 
     for old_str, new_str in fixAsterisk.items():
@@ -1630,12 +1673,12 @@ def translate(expression, TI_on=True, SC_on=False, constants_on=False, coulomb_o
     # yleisiä suureyhtälökohtia
     addAsterisk = {
         "mv": "m*v",
-    #    "at": "a*t",
-        "vt": "v*t",
+     #   "at": "a*t",
+      #  "vt": "v*t",
         "mgh": "m*g*h",
-        "mg": "m*g",
+      #  "mg": "m*g",
         "ρgh": "ρ*g*h",
-        "mc": "m*c",
+      #  "mc": "m*c",
         "cmΔT": "c*m*ΔT",
         "CΔT": "C*ΔT",
         "αl₀ΔT": "α*l₀*ΔT",
@@ -1644,7 +1687,7 @@ def translate(expression, TI_on=True, SC_on=False, constants_on=False, coulomb_o
     }
     for org, new in addAsterisk.items():
         expression = expression.replace(org, new)
-    expression = expression.replace("int_","∫")
+    
     return expression
 
 
@@ -1661,14 +1704,7 @@ constants_on = False
 coulomb_on = False
 
 
-
-
-
-
-#text = r"\begin{cases} x=33+3y =&potatoes\\ y=33+22x =&tomatoes \end{cases}"
-print(translate(r"\\frac{Main.py}{ran}"))
-
-
-#print(translate(text, TI_on, SC_on, constants_on, coulomb_on, e_on, i_on, g_on))
-
-#Use by doing "translate(text)""
+if __name__ == "__main__":
+    print(translate(r"\\frac{translatelatex}{ran}"))
+else:
+    print("Translatelatex.py loaded")
