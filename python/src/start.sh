@@ -4,7 +4,7 @@
 set -e
 
 # Path to your main.py file
-MAIN_PY_PATH="./main.py"
+MAIN_PY_PATH="./server.py"
 PORT=5002
 # Extract the filename without the extension to use with gunicorn
 FILENAME=$(basename -- "$MAIN_PY_PATH")
