@@ -13,8 +13,8 @@ test_cases = [
     (r"\overline{AB}", "(AB)"),
     (r"\bar{a}\cdot \bar{b}", "dotP((a),(b))"),
     (r"\bar{a}\times \bar{b}", "crossP((a),(b))"),  
-    (r"\left(x_{n}\right)", "(x_(n))"),
-    (r"\lim_{x \to a} f(x)", "lim_(xtoa)*f*(x)"),
+    (r" x_{na}", "x"),
+    (r"\lim_{x \to a} f(x)", "lim(x,x,a)"),
     (r"\int_{ }^{ }f(x)\text{d}x", "int_()^()*f*(x)*dx"),
     (r"30°\cdot \frac{\pi }{180°}", "30°*((π)/(180°))")
 ]

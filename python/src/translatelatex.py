@@ -1655,8 +1655,8 @@ def translate(expression, TI_on=True, SC_on=False, constants_on=False, coulomb_o
     expression = expression.replace("\\", "").replace("{", "(").replace("}", ")")
     
 
-
-
+    
+    # Turn expressions like xy=kc into x*y=k*c
     # Define characters to permute
     characters = ['x', 'y', 'z', 'a', 'b', 'c', 'k']
 
