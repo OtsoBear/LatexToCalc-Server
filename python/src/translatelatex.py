@@ -38,7 +38,7 @@ class LaTeX2CalcEngine:
             # operators, abs, infinity
             "\\pm": "±",
             "\\mp": "∓",
-            "\\times": "*",
+            "\\times": "*ΦcrossΦ",
             "\\div": "/",
             "\\cdot": "*",
             "\\left|": "abs(",
@@ -360,7 +360,8 @@ class LaTeX2CalcEngine:
             "arc",
             "nPr",
             "nCr",
-            "dotP"
+            "dotP",
+            "crossP"
         ]
 
         self.common_functions = [
@@ -1329,6 +1330,7 @@ class LaTeX2CalcEngine:
 
         # dot product
         if vector:
+            print(expression)
             for i in range(expression.count('`') // 2):
                 match = re.search(r'\`(\d+)\`\[(.+)\]\`\1\`\*\`(\d+)\`\[(.+)\]\`\3\`', expression)
                 if match:
@@ -1340,6 +1342,7 @@ class LaTeX2CalcEngine:
 
         # \bar£1£{u}£1£*\bar£2£{v}£2£
         for i in range(expression.count('\\bar') // 2):
+            print(expression)
             match = re.search(r'\\bar\£(\d+)\£\{(.+)\}\£\1\£\*\\bar\£(\d+)\£\{(.+)\}\£\3\£', expression)
             if match:
                 tag1 = '£' + match.group(1) + '£'
@@ -1349,6 +1352,7 @@ class LaTeX2CalcEngine:
                 expression = expression.replace(f'\\bar{tag1}{vectorA}{tag1}*\\bar{tag2}{vectorB}{tag2}', f'dotP({vectorA},{vectorB})')
 
         for i in range(expression.count('\\overline') // 2):
+            print(expression)
             match = re.search(r'\\overline\£(\d+)\£\{(.+)\}\£\1\£\*\\overline\£(\d+)\£\{(.+)\}\£\3\£', expression)
             if match:
                 tag1 = '£' + match.group(1) + '£'
@@ -1358,6 +1362,7 @@ class LaTeX2CalcEngine:
                 expression = expression.replace(f'\\overline{tag1}{vectorA}{tag1}*\\overline{tag2}{vectorB}{tag2}', f'dotP({vectorA},{vectorB})')
         
         for i in range(expression.count('\\bar')):
+            print(expression)
             match = re.search(r'\\bar\£(\d+)\£\{(.+)\}\£\1\£\*\\overline\£(\d+)\£\{(.+)\}\£\3\£', expression)
             if match:
                 tag1 = '£' + match.group(1) + '£'
@@ -1367,6 +1372,7 @@ class LaTeX2CalcEngine:
                 expression = expression.replace(f'\\bar{tag1}{vectorA}{tag1}*\\overline{tag2}{vectorB}{tag2}', f'dotP({vectorA},{vectorB})')
 
         for i in range(expression.count('\\overline')):
+            print(expression)
             match = re.search(r'\\overline\£(\d+)\£\{(.+)\}\£\1\£\*\\bar\£(\d+)\£\{(.+)\}\£\3\£', expression)
             if match:
                 tag1 = '£' + match.group(1) + '£'
@@ -1374,7 +1380,59 @@ class LaTeX2CalcEngine:
                 tag2 = '£' + match.group(3) + '£'
                 vectorB = '{' + match.group(4) + '}'
                 expression = expression.replace(f'\\overline{tag1}{vectorA}{tag1}*\\bar{tag2}{vectorB}{tag2}', f'dotP({vectorA},{vectorB})')
-            
+                
+        # cross product        
+        if vector:
+            print(expression)
+            for i in range(expression.count('`') // 2):
+                match = re.search(r'\`(\d+)\`\[(.+)\]\`\1\`\*ΦcrossΦ\`(\d+)\`\[(.+)\]\`\3\`', expression)
+                if match:
+                    tag1 = '`' + match.group(1) + '`'
+                    vectorA = match.group(2)
+                    tag2 = '`' + match.group(3) + '`'
+                    vectorB = match.group(4)
+                    expression = expression.replace(f'{tag1}[{vectorA}]{tag1}*ΦcrossΦ{tag2}[{vectorB}]{tag2}', f'crossP([{vectorA}],[{vectorB}])')
+
+        # \bar£1£{u}£1£*ΦcrossΦ\bar£2£{v}£2£
+        for i in range(expression.count('\\bar') // 2):
+            print(expression)
+            match = re.search(r'\\bar\£(\d+)\£\{(.+)\}\£\1\£\*ΦcrossΦ\\bar\£(\d+)\£\{(.+)\}\£\3\£', expression)
+            if match:
+                tag1 = '£' + match.group(1) + '£'
+                vectorA = '{' + match.group(2) + '}'
+                tag2 = '£' + match.group(3) + '£'
+                vectorB = '{' + match.group(4) + '}'
+                expression = expression.replace(f'\\bar{tag1}{vectorA}{tag1}*ΦcrossΦ\\bar{tag2}{vectorB}{tag2}', f'crossP({vectorA},{vectorB})')
+
+        for i in range(expression.count('\\overline') // 2):
+            print(expression)
+            match = re.search(r'\\overline\£(\d+)\£\{(.+)\}\£\1\£\*ΦcrossΦ\\overline\£(\d+)\£\{(.+)\}\£\3\£', expression)
+            if match:
+                tag1 = '£' + match.group(1) + '£'
+                vectorA = '{' + match.group(2) + '}'
+                tag2 = '£' + match.group(3) + '£'
+                vectorB = '{' + match.group(4) + '}'
+                expression = expression.replace(f'\\overline{tag1}{vectorA}{tag1}*ΦcrossΦ\\overline{tag2}{vectorB}{tag2}', f'crossP({vectorA},{vectorB})')
+        
+        for i in range(expression.count('\\bar')):
+            print(expression)
+            match = re.search(r'\\bar\£(\d+)\£\{(.+)\}\£\1\£\*ΦcrossΦ\\overline\£(\d+)\£\{(.+)\}\£\3\£', expression)
+            if match:
+                tag1 = '£' + match.group(1) + '£'
+                vectorA = '{' + match.group(2) + '}'
+                tag2 = '£' + match.group(3) + '£'
+                vectorB = '{' + match.group(4) + '}'
+                expression = expression.replace(f'\\bar{tag1}{vectorA}{tag1}*ΦcrossΦ\\overline{tag2}{vectorB}{tag2}', f'crossP({vectorA},{vectorB})')
+
+        for i in range(expression.count('\\overline')):
+            print(expression)
+            match = re.search(r'\\overline\£(\d+)\£\{(.+)\}\£\1\£\*ΦcrossΦ\\bar\£(\d+)\£\{(.+)\}\£\3\£', expression)
+            if match:
+                tag1 = '£' + match.group(1) + '£'
+                vectorA = '{' + match.group(2) + '}'
+                tag2 = '£' + match.group(3) + '£'
+                vectorB = '{' + match.group(4) + '}'
+                expression = expression.replace(f'\\overline{tag1}{vectorA}{tag1}*ΦcrossΦ\\bar{tag2}{vectorB}{tag2}', f'crossP({vectorA},{vectorB})')   
         vector = False
         expression = expression.replace("bar", "").replace("overline", "")
 
@@ -1387,7 +1445,7 @@ class LaTeX2CalcEngine:
             else:
                 expression = expression.replace('𝕚', f'[1,0]', 1).replace('𝕛', f'[0,1]', 1)
             vector = True
-            
+        print(expression)    
         return expression
 
 
