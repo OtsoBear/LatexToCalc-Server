@@ -1302,50 +1302,99 @@ class LaTeX2CalcEngine:
                 if left_count == right_count:
                     return start_position + match.end()
         return -1
-    def translateDerivatives(self, expression):        
-        # Pattern to match {d followed by any non-space, non-empty character
-        pattern = r"\{d\S\}"
+    def translateDerivatives(self, expression):
+        diffVar = None
+        derivative = False
+        if re.search(r"\{d\S\}", expression) != None:
+            derivative = True
+        if re.search(r"D", expression) != None:
+            diffVar = "x"
+            derivative = True
+        if derivative == True and diffVar != "x":
+            # Pattern to match {d followed by any non-space, non-empty character
+            pattern = r"\{d\S\}"
 
-        # Finding all matches for the pattern
-        matches = list(re.finditer(pattern, expression))
+            # Finding all matches for the pattern
+            matches = list(re.finditer(pattern, expression))
 
-        # Print matches and their positions
-        for match in matches:
+            # Print matches and their positions
+            for match in matches:
 
-            # Initialize the count for \left and \right
-            left_count = 0
-            right_count = 0
-            
-            # Set start_position to the end of the current match
-            start_position = match.end()
-
-            # Variable to store the final right position
-            final_right_pos = -1
-
-            # Iterate through \left and \right tokens from the start_position
-            for match2 in re.finditer(r"\\left|\\right", expression[start_position:]):
-                # Get the matched string
-                matched_string = match2.group()
+                # Initialize the count for \left and \right
+                left_count = 0
+                right_count = 0
                 
-                # Update counts based on the matched string
-                if matched_string == r"\left":
-                    left_count += 1
-                elif matched_string == r"\right":
-                    right_count += 1
-                    
-                    # Check if counts match
-                    if left_count == right_count:
-                        # Calculate the position before the final \right
-                        final_right_pos = start_position + match2.start()
-                        break
-            
-            if final_right_pos != -1:
-                # Insert "x" just before the final \right
-                expression = expression[:final_right_pos] + "," + match.group(0).replace("{d", "").replace("}", "") + expression[final_right_pos:]
+                # Set start_position to the end of the current match
+                start_position = match.end()
 
+                # Variable to store the final right position
+                final_right_pos = -1
+
+                # Iterate through \left and \right tokens from the start_position
+                for match2 in re.finditer(r"\\left|\\right", expression[start_position:]):
+                    # Get the matched string
+                    matched_string = match2.group()
+                    
+                    # Update counts based on the matched string
+                    if matched_string == r"\left":
+                        left_count += 1
+                    elif matched_string == r"\right":
+                        right_count += 1
+                        
+                        # Check if counts match
+                        if left_count == right_count:
+                            # Calculate the position before the final \right
+                            final_right_pos = start_position + match2.start()
+                            break
+                
+                if final_right_pos != -1:
+                    # Insert "x" just before the final \right
+                    expression = expression[:final_right_pos] + "," + match.group(0).replace("{d", "").replace("}", "") + expression[final_right_pos:]
+            return expression
+        if derivative == True and diffVar == "x":
+                # Pattern to match 'D'
+                pattern = r"D"
+                
+                # Finding all matches for the pattern
+                matches = list(re.finditer(pattern, expression))
+                expression = expression.replace("D", "")
+                # Print matches and their positions
+                for match in matches:
+                    # Initialize the count for \left and \right
+                    left_count = 0
+                    right_count = 0
+                    
+                    # Set start_position to the end of the current match
+                    start_position = match.end()
+
+                    # Variable to store the final right position
+                    final_right_pos = -1
+
+                    # Iterate through \left and \right tokens from the start_position
+                    for match2 in re.finditer(r"\\left|\\right", expression[start_position:]):
+                        # Get the matched string
+                        matched_string = match2.group()
+                        
+                        # Update counts based on the matched string
+                        if matched_string == r"\left":
+                            left_count += 1
+                        elif matched_string == r"\right":
+                            right_count += 1
+                            
+                            # Check if counts match
+                            if left_count == right_count:
+                                # Calculate the position before the final \right
+                                final_right_pos = start_position + match2.start()
+                                break
+                    
+                    if final_right_pos != -1:
+                        # Insert "x" just before the final \right
+                        expression = expression[:final_right_pos] + ",x" + expression[final_right_pos:]
+
+                return expression
+            
         
         return expression
-
     # OPTIMIZE
     def translateVectors(self, expression):
         if not ("𝕚" in expression or "ӄ" in expression or "𝕛" in expression or "matrix" in expression or "bar" in expression or "`" in expression or "overline" in expression):
@@ -1628,7 +1677,6 @@ def translate(expression, TI_on=True, SC_on=False, constants_on=False, coulomb_o
     if constants_on:
         expression = engine.translateConstants(expression)
     expression = engine.applyTags(expression)
-    expression = engine.translateDerivatives(expression)
 
     expression = engine.translateUnits1(expression)
     expression = engine.translateSum(expression)
@@ -1636,10 +1684,14 @@ def translate(expression, TI_on=True, SC_on=False, constants_on=False, coulomb_o
     expression = engine.translateIntegrals(expression) 
     expression = engine.translateCommonFunctions(expression)
     expression = engine.translateLimits(expression)
+
     expression = engine.translateCombinations(expression) 
     expression = engine.translatePermutations(expression)
+    
+    expression = engine.translateDerivatives(expression)
     expression = engine.translateFractions(expression)
     # expression = engine.translateLn(expression)
+    
     expression = engine.translateLog(expression)
     expression = engine.translateLowerIndexazAZ(expression)
     expression = engine.translateLg(expression)
@@ -1706,6 +1758,7 @@ def translate(expression, TI_on=True, SC_on=False, constants_on=False, coulomb_o
             expression = expression.replace("c@e@il", "ceil")
     
     expression = expression.replace("\\", "").replace("{", "(").replace("}", ")")
+    
     #unicode character U+F008 : <private-use> () used for derivative in Nspire
     expression = re.sub(r"\(\(d\)\/\(d.\)\)", "", expression)  #
 

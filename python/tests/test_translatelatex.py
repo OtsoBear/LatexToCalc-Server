@@ -19,7 +19,8 @@ test_cases = [
     (r"\int_{ }^{ }f(x)\text{d}x", "int_()^()*f*(x)*dx"),
     (r"30°\cdot \frac{\pi }{180°}", "30°*((π)/(180°))"),
     (r"\frac{d}{dx}\left(\frac{x}{180\sin \left(\pi \right)}\right)", "(((x)/(180*sin(π))),x)"),
-    (r"\frac{d}{dt}\left(t^2\cdot\frac{d}{dx}\left(3x^2\right)\right)", r"(t^2*(3*x^2,x),t)")
+    (r"\frac{d}{dt}\left(t^2\cdot\frac{d}{dx}\left(3x^2\right)\right)", r"(t^2*(3*x^2,x),t)"),
+    (r"D\left(3x^2\right)", r"(3*x^2,x)")
 ]
 
 #Expression: \int _{-1}^11x^1\ dx
