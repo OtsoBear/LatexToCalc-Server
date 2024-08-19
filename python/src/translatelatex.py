@@ -421,6 +421,7 @@ class LaTeX2CalcEngine:
         return expression
 
     def applyTags(self, expression):
+        print("before tags ",expression)
         # 1. ()
         old_expression = expression
         expression = "("+ expression + ")"
@@ -437,7 +438,8 @@ class LaTeX2CalcEngine:
                 expression = expression.replace(match, "###", amount-1)
                 expression = expression.replace(match, tag + match + tag, 1)
                 expression = expression.replace("###", match, amount-1)
-        
+        print("1. tag ",expression)
+
         # 2. {}
         old_expression = expression
         expression = "{"+ expression + "}"
@@ -454,7 +456,7 @@ class LaTeX2CalcEngine:
                 expression = expression.replace(match, "###", amount-1)
                 expression = expression.replace(match, tag + match + tag, 1)
                 expression = expression.replace("###", match, amount-1)
-        
+        print("2. tag ",expression)        
         # 3. []
         old_expression = expression
         expression = "["+ expression + "]"
@@ -471,6 +473,7 @@ class LaTeX2CalcEngine:
                 expression = expression.replace(match, "###", amount-1)
                 expression = expression.replace(match, tag + match + tag, 1)
                 expression = expression.replace("###", match, amount-1)
+        print("3. tag ",expression)
         return expression
   
     def translateConstants(self, expression: str, dictionary: dict=None):
@@ -1293,7 +1296,61 @@ class LaTeX2CalcEngine:
                         )
         
         return expression
+    def findEndBracket(text, start_position):
+        left_count = right_count = 0
+        for match in re.finditer(r"\\left|\\right", text[start_position:]):
+            if match.group() == r"\left":
+                left_count += 1
+            elif match.group() == r"\right":
+                right_count += 1
+                if left_count == right_count:
+                    return start_position + match.end()
+        return -1
+    def translateDerivatives(self, expression):
+        print("Derivative:", expression)
+        
+        # Pattern to match {d followed by any non-space, non-empty character
+        pattern = r"\{d([^\s])\}"
 
+        # Finding all matches for the pattern
+        matches = list(re.finditer(pattern, expression))
+
+        # Printing the matches and their positions
+        for match in matches:
+            print(f"Matched: {match.group(0)}, Start: {match.start()}, End: {match.end()}")
+
+        # Additional processing to find the position of the final balanced \right
+        left_count = right_count = 0
+        start_position = matches[-1].end() if matches else 0  # Start after the last {d}
+
+        # Variable to store the final right position
+        final_right_pos = -1
+
+        # Iterate through \left and \right tokens
+        for m in re.finditer(r"\\left|\\right", expression[start_position:]):
+            if m.group() == r"\left":
+                left_count += 1
+            elif m.group() == r"\right":
+                right_count += 1
+                if left_count == right_count:
+                    final_right_pos = start_position + m.start()  # Position before the final \right
+                    break
+        
+        if final_right_pos != -1:
+            # Insert "x" just before the final \right
+            expression = expression[:final_right_pos] + ","+"x" + expression[final_right_pos:]
+
+        print(f"Updated expression: {expression}")
+        
+        return expression
+           
+      #  matches = re.findall(r'\(\(\d\)/\(\d.*?\)\)', expression)
+
+        # Replace matches with a placeholder and print the modified expression
+       # replaced_expression = re.sub(r'\(\(\d\)/\(\d.*?\)\)', "D", expression)
+      #  print("Modified expression:", replaced_expression)
+
+       # return replaced_expression
     # OPTIMIZE
     def translateVectors(self, expression):
         if not ("𝕚" in expression or "ӄ" in expression or "𝕛" in expression or "matrix" in expression or "bar" in expression or "`" in expression or "overline" in expression):
@@ -1575,6 +1632,8 @@ def translate(expression, TI_on=True, SC_on=False, constants_on=False, coulomb_o
     if constants_on:
         expression = engine.translateConstants(expression)
     expression = engine.applyTags(expression)
+    expression = engine.translateDerivatives(expression)
+
     expression = engine.translateUnits1(expression)
     expression = engine.translateSum(expression)
     expression = engine.translateProd(expression)
@@ -1587,13 +1646,11 @@ def translate(expression, TI_on=True, SC_on=False, constants_on=False, coulomb_o
     # expression = engine.translateLn(expression)
     expression = engine.translateLog(expression)
     expression = engine.translateLowerIndexazAZ(expression)
-
     expression = engine.translateLg(expression)
     expression = engine.translateSqrt(expression)
     expression = engine.translateSystem(expression)
     expression = engine.translateArrows(expression)
     expression = engine.translateVectors(expression)
-    
     expression = engine.translateMatrices(expression) 
     # TI _unit viimeistely
     expression = engine.translateUnits2(expression) # \mathrm{32\ \frac{kJ}{kg\cdot K}+kJ\cdot \text{kg}-\frac{\text{kJ}}{\text{kg}\cdot \text{K}}} 
@@ -1653,7 +1710,7 @@ def translate(expression, TI_on=True, SC_on=False, constants_on=False, coulomb_o
             expression = expression.replace("c@e@il", "ceil")
     
     expression = expression.replace("\\", "").replace("{", "(").replace("}", ")")
-    
+    expression = expression.replace("((d)/(dx))","")
 
     
     # Turn expressions like xy=kc into x*y=k*c
