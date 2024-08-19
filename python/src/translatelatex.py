@@ -1292,106 +1292,44 @@ class LaTeX2CalcEngine:
                         )
         
         return expression
-    def findEndBracket(text, start_position):
-        left_count = right_count = 0
-        for match in re.finditer(r"\\left|\\right", text[start_position:]):
-            if match.group() == r"\left":
-                left_count += 1
-            elif match.group() == r"\right":
-                right_count += 1
-                if left_count == right_count:
-                    return start_position + match.end()
-        return -1
-    def translateDerivatives(self, expression):
-        diffVar = None
-        derivative = False
-        if re.search(r"\{d\S\}", expression) != None:
-            derivative = True
-        if re.search(r"D", expression) != None:
-            diffVar = "x"
-            derivative = True
-        if derivative == True and diffVar != "x":
-            # Pattern to match {d followed by any non-space, non-empty character
-            pattern = r"\{d\S\}"
 
-            # Finding all matches for the pattern
+    def translateDerivatives(self, expression):
+        derivative = False
+        
+        if re.search(r"\{d\S\}", expression):
+            derivative = True
+            
+        if re.search(r"D", expression):
+            expression = expression.replace("D", r"{{d}/{dx}}")
+            derivative = True
+            
+        if derivative:
+            # Match pattern for {d followed by any non-space character
+            pattern = r"\{d\S\}"
             matches = list(re.finditer(pattern, expression))
 
-            # Print matches and their positions
             for match in matches:
-
-                # Initialize the count for \left and \right
                 left_count = 0
                 right_count = 0
-                
-                # Set start_position to the end of the current match
                 start_position = match.end()
-
-                # Variable to store the final right position
                 final_right_pos = -1
 
-                # Iterate through \left and \right tokens from the start_position
+                # Find matching bracket
                 for match2 in re.finditer(r"\\left|\\right", expression[start_position:]):
-                    # Get the matched string
-                    matched_string = match2.group()
-                    
-                    # Update counts based on the matched string
-                    if matched_string == r"\left":
+                    if match2.group() == r"\left":
                         left_count += 1
-                    elif matched_string == r"\right":
+                    elif match2.group() == r"\right":
                         right_count += 1
-                        
-                        # Check if counts match
+
                         if left_count == right_count:
-                            # Calculate the position before the final \right
                             final_right_pos = start_position + match2.start()
                             break
-                
+
                 if final_right_pos != -1:
-                    # Insert "x" just before the final \right
+                    # Add the derivative variable to the expression
                     expression = expression[:final_right_pos] + "," + match.group(0).replace("{d", "").replace("}", "") + expression[final_right_pos:]
+
             return expression
-        if derivative == True and diffVar == "x":
-                # Pattern to match 'D'
-                pattern = r"D"
-                
-                # Finding all matches for the pattern
-                matches = list(re.finditer(pattern, expression))
-                expression = expression.replace("D", "")
-                # Print matches and their positions
-                for match in matches:
-                    # Initialize the count for \left and \right
-                    left_count = 0
-                    right_count = 0
-                    
-                    # Set start_position to the end of the current match
-                    start_position = match.end()
-
-                    # Variable to store the final right position
-                    final_right_pos = -1
-
-                    # Iterate through \left and \right tokens from the start_position
-                    for match2 in re.finditer(r"\\left|\\right", expression[start_position:]):
-                        # Get the matched string
-                        matched_string = match2.group()
-                        
-                        # Update counts based on the matched string
-                        if matched_string == r"\left":
-                            left_count += 1
-                        elif matched_string == r"\right":
-                            right_count += 1
-                            
-                            # Check if counts match
-                            if left_count == right_count:
-                                # Calculate the position before the final \right
-                                final_right_pos = start_position + match2.start()
-                                break
-                    
-                    if final_right_pos != -1:
-                        # Insert "x" just before the final \right
-                        expression = expression[:final_right_pos] + ",x" + expression[final_right_pos:]
-
-                return expression
             
         
         return expression
