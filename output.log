@@ -1,5 +1,0 @@
-..FF.....F...                                                            [100%]
-=========================== short test summary info ============================
-FAILED python/tests/test_translatelatex.py::test_translate[\\sum_{i=1}^nx_i-\u2211(x\uf869,i,1,n)]
-FAILED python/tests/test_translatelatex.py::test_translate[\\left(\\begin{matrix} n\\\\ k \\end{matrix}\\right)=\\dfrac{n!}{k!(n-k)!}-nCr(n,k)=((n!)/(k!*(n-k)!))]
-FAILED python/tests/test_translatelatex.py::test_translate[\\bar{a}\\times \\bar{b}-crossP((a),(b))]
