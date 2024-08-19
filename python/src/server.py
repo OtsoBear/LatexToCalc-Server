@@ -1,3 +1,4 @@
+from os import path, makedirs
 from flask import Flask, jsonify, request, render_template
 from flask_cors import CORS
 from translatelatex import translate
@@ -7,8 +8,12 @@ from time import time
 app = Flask(__name__)
 CORS(app)
 
+# Ensure the logs directory exists
+if not path.exists('logs'):
+    makedirs('logs')
+
 # Configure logging
-log_handler = logging.FileHandler('app.log')
+log_handler = logging.FileHandler('logs/app.log')  # Save logs in the logs folder
 log_handler.setLevel(logging.INFO)
 formatter = logging.Formatter('%(asctime)s | %(levelname)s | %(message)s')
 log_handler.setFormatter(formatter)
@@ -50,14 +55,14 @@ def translate_expression():
         time_taken = (time() - start_time) * 1000
 
         # Log the translation process
-        app_logger.info(f"{real_ip} | {expression} | {result} | {time_taken:.2f} ms | None")
+        app_logger.info(f"{real_ip} | {expression} | {result} | {time_taken:.2f} ms | None".replace("\n", " "))
 
         return jsonify({'result': result})
 
     except Exception as e:
         # Handle and log errors
         time_taken = (time() - start_time) * 1000
-        app_logger.error(f"{real_ip} | {expression} | Error: {str(e)} | {time_taken:.2f} ms")
+        app_logger.error(f"{real_ip} | {expression} | Error: {str(e)} | {time_taken:.2f} ms".replace("\n", " "))
         return jsonify({'error': 'An error occurred during translation.'}), 500
 
 if __name__ == '__main__':
