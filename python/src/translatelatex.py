@@ -421,7 +421,6 @@ class LaTeX2CalcEngine:
         return expression
 
     def applyTags(self, expression):
-        print("before tags ",expression)
         # 1. ()
         old_expression = expression
         expression = "("+ expression + ")"
@@ -438,7 +437,6 @@ class LaTeX2CalcEngine:
                 expression = expression.replace(match, "###", amount-1)
                 expression = expression.replace(match, tag + match + tag, 1)
                 expression = expression.replace("###", match, amount-1)
-        print("1. tag ",expression)
 
         # 2. {}
         old_expression = expression
@@ -456,7 +454,6 @@ class LaTeX2CalcEngine:
                 expression = expression.replace(match, "###", amount-1)
                 expression = expression.replace(match, tag + match + tag, 1)
                 expression = expression.replace("###", match, amount-1)
-        print("2. tag ",expression)        
         # 3. []
         old_expression = expression
         expression = "["+ expression + "]"
@@ -473,7 +470,6 @@ class LaTeX2CalcEngine:
                 expression = expression.replace(match, "###", amount-1)
                 expression = expression.replace(match, tag + match + tag, 1)
                 expression = expression.replace("###", match, amount-1)
-        print("3. tag ",expression)
         return expression
   
     def translateConstants(self, expression: str, dictionary: dict=None):
@@ -1306,51 +1302,50 @@ class LaTeX2CalcEngine:
                 if left_count == right_count:
                     return start_position + match.end()
         return -1
-    def translateDerivatives(self, expression):
-        print("Derivative:", expression)
-        
+    def translateDerivatives(self, expression):        
         # Pattern to match {d followed by any non-space, non-empty character
-        pattern = r"\{d([^\s])\}"
+        pattern = r"\{d\S\}"
 
         # Finding all matches for the pattern
         matches = list(re.finditer(pattern, expression))
 
-        # Printing the matches and their positions
+        # Print matches and their positions
         for match in matches:
-            print(f"Matched: {match.group(0)}, Start: {match.start()}, End: {match.end()}")
 
-        # Additional processing to find the position of the final balanced \right
-        left_count = right_count = 0
-        start_position = matches[-1].end() if matches else 0  # Start after the last {d}
+            # Initialize the count for \left and \right
+            left_count = 0
+            right_count = 0
+            
+            # Set start_position to the end of the current match
+            start_position = match.end()
 
-        # Variable to store the final right position
-        final_right_pos = -1
+            # Variable to store the final right position
+            final_right_pos = -1
 
-        # Iterate through \left and \right tokens
-        for m in re.finditer(r"\\left|\\right", expression[start_position:]):
-            if m.group() == r"\left":
-                left_count += 1
-            elif m.group() == r"\right":
-                right_count += 1
-                if left_count == right_count:
-                    final_right_pos = start_position + m.start()  # Position before the final \right
-                    break
-        
-        if final_right_pos != -1:
-            # Insert "x" just before the final \right
-            expression = expression[:final_right_pos] + ","+"x" + expression[final_right_pos:]
+            # Iterate through \left and \right tokens from the start_position
+            for match2 in re.finditer(r"\\left|\\right", expression[start_position:]):
+                # Get the matched string
+                matched_string = match2.group()
+                
+                # Update counts based on the matched string
+                if matched_string == r"\left":
+                    left_count += 1
+                elif matched_string == r"\right":
+                    right_count += 1
+                    
+                    # Check if counts match
+                    if left_count == right_count:
+                        # Calculate the position before the final \right
+                        final_right_pos = start_position + match2.start()
+                        break
+            
+            if final_right_pos != -1:
+                # Insert "x" just before the final \right
+                expression = expression[:final_right_pos] + "," + match.group(0).replace("{d", "").replace("}", "") + expression[final_right_pos:]
 
-        print(f"Updated expression: {expression}")
         
         return expression
-           
-      #  matches = re.findall(r'\(\(\d\)/\(\d.*?\)\)', expression)
 
-        # Replace matches with a placeholder and print the modified expression
-       # replaced_expression = re.sub(r'\(\(\d\)/\(\d.*?\)\)', "D", expression)
-      #  print("Modified expression:", replaced_expression)
-
-       # return replaced_expression
     # OPTIMIZE
     def translateVectors(self, expression):
         if not ("𝕚" in expression or "ӄ" in expression or "𝕛" in expression or "matrix" in expression or "bar" in expression or "`" in expression or "overline" in expression):
@@ -1624,6 +1619,7 @@ class LaTeX2CalcEngine:
 
 def translate(expression, TI_on=True, SC_on=False, constants_on=False, coulomb_on=False, e_on=False, i_on=False, g_on=False):
     engine = LaTeX2CalcEngine(TI_on, SC_on)
+    
     expression = re.sub(r'\\operatorname\{([a-z]+)\}', r'\\\1', expression)
     expression = engine.translateSymbols(expression)
     if TI_on: expression = expression.replace("\\Omega", "Ω").replace(",", ".")
@@ -1710,7 +1706,8 @@ def translate(expression, TI_on=True, SC_on=False, constants_on=False, coulomb_o
             expression = expression.replace("c@e@il", "ceil")
     
     expression = expression.replace("\\", "").replace("{", "(").replace("}", ")")
-    expression = expression.replace("((d)/(dx))","")
+    #unicode character U+F008 : <private-use> () used for derivative in Nspire
+    expression = re.sub(r"\(\(d\)\/\(d.\)\)", "", expression)  #
 
     
     # Turn expressions like xy=kc into x*y=k*c
