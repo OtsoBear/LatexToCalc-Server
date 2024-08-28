@@ -1530,71 +1530,64 @@ class LaTeX2CalcEngine:
         
         return expression
 
-    def translateLowerIndex(self, expression):
-        return re.sub(r'_([0-9])', lambda match: "₀₁₂₃₄₅₆₇₈₉"[int(match.group(1))], expression)
+    def translateSubscripts(self, expression):
+        # Define the regex pattern to capture content inside curly braces following an underscore
+        pattern = r'_(?:[^{]*?)\{(.*?)\}'
 
-    def translateLowerIndexazAZ(self, expression):
+        # Define the subscript digits and the letter mappings
+        subscript_digits = "₀₁₂₃₄₅₆₇₈₉"
         indexDict = {
             # az
-            "a": "",
-            "b": "",
-            "c": "",
-            "d": "",
-            "e": "",
-            "f": "",
-            "g": "",
-            "h": "",
-            "i": "",
-            "j": "",
-            "k": "",
-            "l": "",
-            "m": "",
-            "n": "",
-            "o": "",
-            "p": "",
-            "q": "",
-            "r": "",
-            "s": "",
-            "t": "",
-            "u": "",
-            "v": "",
-            "w": "",
-            "x": "",
-            "y": "",
-            "z": "",
+            "a": "", "b": "", "c": "", "d": "", "e": "", "f": "",
+            "g": "", "h": "", "i": "", "j": "", "k": "", "l": "",
+            "m": "", "n": "", "o": "", "p": "", "q": "", "r": "",
+            "s": "", "t": "", "u": "", "v": "", "w": "", "x": "",
+            "y": "", "z": "",
 
             # AZ
-            "A": "",
-            "B": "",
-            "C": "",
-            "D": "",
-            "E": "",
-            "F": "",
-            "G": "",
-            "H": "",
-            "I": "",
-            "J": "",
-            "K": "",
-            "L": "",
-            "M": "",
-            "N": "",
-            "O": "",
-            "P": "",
-            "Q": "",
-            "R": "",
-            "S": "",
-            "T": "",
-            "U": "",
-            "V": "",
-            "W": "",
-            "X": "",
-            "Y": "",
-            "Z": ""
+            "A": "", "B": "", "C": "", "D": "", "E": "", "F": "",
+            "G": "", "H": "", "I": "", "J": "", "K": "", "L": "",
+            "M": "", "N": "", "O": "", "P": "", "Q": "", "R": "",
+            "S": "", "T": "", "U": "", "V": "", "W": "", "X": "",
+            "Y": "", "Z": ""
         }
         
-        
-        return re.sub(r'_([a-zA-Z])', lambda match: indexDict[match.group(1)], expression)
+        # Function to translate characters within the subscript
+        def subscript_translator(content):
+            translated = ''.join(
+                subscript_digits[int(char)] if char.isdigit() else indexDict.get(char, char)
+                for char in content
+            )
+            return translated
 
+        # Find all matches for the pattern
+        matches = list(re.finditer(pattern, expression))
+        
+        for match in matches:
+            # Extract the content inside the curly braces
+            content = match.group(1)
+            # Translate the content
+            translated_content = subscript_translator(content)
+            # Build the old substring including the curly braces
+            old_substring = f'{{{content}}}'
+            
+            # Replace the old substring with the translated content
+            start_index = match.start()
+            print(start_index)
+            print(expression)
+            expression = expression[:start_index] + expression[start_index:].replace(old_substring, translated_content, 1)
+            print(expression)
+            # Remove the leading underscore before the replaced content
+            # Loop left to find the first underscore
+            underscore_pos = start_index 
+            while expression[underscore_pos] != '_':
+                underscore_pos -= 1
+            print("before", expression[:underscore_pos])
+            print( "after", expression[underscore_pos + 1:] )
+            expression = expression[:underscore_pos] + expression[underscore_pos + 1:]   
+            
+
+        return expression
     def removeIdentifiers(self, expression):
         patterns = [r'\£([0-9]+)\£', r'\$([0-9]+)\$', r'\`([0-9]+)\`', r'\§([0-9]+)\§']
         for pattern in patterns:
@@ -1631,7 +1624,7 @@ def translate(expression, TI_on=True, SC_on=False, constants_on=False, coulomb_o
     # expression = engine.translateLn(expression)
     
     expression = engine.translateLog(expression)
-    expression = engine.translateLowerIndexazAZ(expression)
+    expression = engine.translateSubscripts(expression)
     expression = engine.translateLg(expression)
     expression = engine.translateSqrt(expression)
     expression = engine.translateSystem(expression)
@@ -1664,7 +1657,7 @@ def translate(expression, TI_on=True, SC_on=False, constants_on=False, coulomb_o
     elif constants_on: expression = expression.replace("k", "_k").replace("Ｇ", "_g")
     
     # lower index
-    expression = engine.translateLowerIndex(expression)
+    #expression = engine.translateLowerIndex(expression)
 
     # remove identifiers
     expression = engine.removeIdentifiers(expression)

@@ -13,14 +13,14 @@ test_cases = [
     (r"\overline{AB}", "(AB)"),
     (r"\bar{a}\cdot \bar{b}", "dotP((a),(b))"),
     (r"\bar{a}\times \bar{b}", "crossP((a),(b))"),  
-                                                # (r" x_{na}", "x"),
+    (r"f_{Auto}", "f"),
     (r"t^{2\cdot 2}", "t^(2*2)"),
-  # (r"\lim_{x \to a} f(x)", "lim(x,x,a)"),
+    (r"\lim _{x\rightarrow \infty ^-}\left(x+1\right)", "lim(x+1,x,∞,-1)"),
     (r"\int_{ }^{ }f(x)\text{d}x", "int_()^()*f*(x)*dx"),
     (r"30°\cdot \frac{\pi }{180°}", "30°*((π)/(180°))"),
     (r"\frac{d}{dx}\left(\frac{x}{180\sin \left(\pi \right)}\right)", "(((x)/(180*sin(π))),x)"),
-    (r"\frac{d}{dt}\left(t^2\cdot\frac{d}{dx}\left(3x^2\right)\right)", r"(t^2*(3*x^2,x),t)"),
-    (r"D\left(3x^2\right)", r"(3*x^2,x)")
+    (r"\frac{d}{dt}\left(t^2\cdot\frac{d}{dx}\left(3x^2\right)\right)", "(t^2*(3*x^2,x),t)"),
+    (r"D\left(3x^{22}\right)", "(3*x^(22),x)")
 ]
 
 #Expression: \int _{-1}^11x^1\ dx

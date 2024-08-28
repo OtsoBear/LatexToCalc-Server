@@ -1,9 +1,9 @@
-from os import path, makedirs
-from flask import Flask, jsonify, request, render_template
+from flask import Flask, jsonify, request, send_from_directory
 from flask_cors import CORS
 from translatelatex import translate
 import logging
 from time import time
+from os import path, makedirs
 
 app = Flask(__name__)
 CORS(app)
@@ -22,22 +22,22 @@ app_logger = logging.getLogger('app_logger')
 app_logger.addHandler(log_handler)
 app_logger.setLevel(logging.INFO)
 
-@app.route('/')
-def index():
-    return render_template('index.html')
+# Serve all files in the 'templates' directory
+@app.route('/<path:filename>')
+def serve_file(filename):
+    # Serve files from the 'templates' directory
+    return send_from_directory(path.join('src', 'templates', 'reference', 'modules', 'ROOT'), filename)
 
 @app.route('/translate', methods=['POST'])
 def translate_expression():
     start_time = time()
 
     try:
-        # Get client IP address
         real_ip = request.headers.get('X-Real-IP')
         forwarded_for = request.headers.get('X-Forwarded-For')
         if forwarded_for:
-            real_ip = forwarded_for.split(',')[0]  # Use the first IP in the list
+            real_ip = forwarded_for.split(',')[0]
 
-        # Extract translation data from the request
         data = request.json
         expression = data.get('expression', '')
         settings = {
@@ -50,17 +50,14 @@ def translate_expression():
             'g_on': data.get('g_on', False)
         }
 
-        # Perform translation
         result = translate(expression, **settings)
         time_taken = (time() - start_time) * 1000
 
-        # Log the translation process
         app_logger.info(f"{real_ip} | {expression} | {result} | {time_taken:.2f} ms | None".replace("\n", " "))
 
         return jsonify({'result': result})
 
     except Exception as e:
-        # Handle and log errors
         time_taken = (time() - start_time) * 1000
         app_logger.error(f"{real_ip} | {expression} | Error: {str(e)} | {time_taken:.2f} ms".replace("\n", " "))
         return jsonify({'error': 'An error occurred during translation.'}), 500
