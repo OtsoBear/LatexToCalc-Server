@@ -23,6 +23,9 @@ app_logger.addHandler(log_handler)
 app_logger.setLevel(logging.INFO)
 
 # Serve all files in the 'templates' directory
+@app.route('/')
+def index():
+    return send_from_directory('templates', 'index.html')
 @app.route('/<path:filename>')
 def serve_file(filename):
     # Serve files from the 'templates' directory

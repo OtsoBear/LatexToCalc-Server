@@ -3,13 +3,3 @@ __pycache__/
 .venv/
 .vscode/
 *.log
-.python/src/templates/
-*.svg
-*.html
-*.css
-*.js
-*.yml
-*.png
-*.adoc
-*.xml
-!*index.html
