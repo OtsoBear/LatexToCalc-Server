@@ -6,7 +6,7 @@ set -e
 # Path to your virtual environment
 VENV_PATH="../.venv"
 
-# Function to ask for user confirmation and install pip or python3-venv
+# Function to ask for user confirmation and install a package
 install_package() {
     read -p "$2 not found. Do you want to install $2 using $1? (y/n): " -n 1 -r
     echo # Move to a new line
@@ -14,6 +14,8 @@ install_package() {
         case $1 in
             apt-get) sudo apt-get update && sudo apt-get install -y $2 ;;
             yum) sudo yum install -y $2 ;;
+            dnf) sudo dnf install -y $2 ;;
+            pacman) sudo pacman -S --noconfirm $2 ;;
             brew) brew install $2 ;;
         esac
     else
@@ -22,14 +24,47 @@ install_package() {
     fi
 }
 
-# Check if pip is installed; if not, determine the package manager and prompt user
-if ! command -v pip &> /dev/null; then
-    if command -v apt-get &> /dev/null; then
+# Function to check if a command exists
+check_command() {
+    command -v "$1" &> /dev/null
+}
+
+# Check if Python3 is installed; if not, determine the package manager and prompt user
+if ! check_command python3; then
+    echo "Python3 is not installed."
+    if check_command apt-get; then
+        install_package "apt-get" "python3"
+    elif check_command yum; then
+        install_package "yum" "python3"
+    elif check_command dnf; then
+        install_package "dnf" "python3"
+    elif check_command pacman; then
+        install_package "pacman" "python"
+    elif check_command brew; then
+        install_package "brew" "python"
+    elif [[ "$OSTYPE" == "msys" ]] || [[ "$OSTYPE" == "win32" ]]; then
+        echo "Please install Python manually from https://www.python.org/downloads/windows/"
+        exit 1
+    else
+        echo "No known package manager found. Please install Python manually."
+        exit 1
+    fi
+else
+    echo "Python3 is already installed."
+fi
+
+# Check if pip is installed; if not, prompt for installation
+if ! check_command pip; then
+    if check_command apt-get; then
         install_package "apt-get" "python3-pip"
-    elif command -v yum &> /dev/null; then
+    elif check_command yum; then
         install_package "yum" "python3-pip"
-    elif command -v brew &> /dev/null; then
-        install_package "brew" "python3"
+    elif check_command dnf; then
+        install_package "dnf" "python3-pip"
+    elif check_command pacman; then
+        install_package "pacman" "python-pip"
+    elif check_command brew; then
+        install_package "brew" "pip"
     else
         echo "No known package manager found. Please install pip manually."
         exit 1
@@ -38,8 +73,8 @@ else
     echo "pip is already installed."
 fi
 
-# Check if python3-venv is installed
-if ! dpkg -s python3-venv &> /dev/null && command -v apt-get &> /dev/null; then
+# Check if python3-venv is installed (for Debian-based systems)
+if ! dpkg -s python3-venv &> /dev/null && check_command apt-get; then
     install_package "apt-get" "python3-venv"
 fi
 
@@ -78,7 +113,6 @@ if [[ ! -x "$GUNICORN_PATH" ]]; then
     echo "Gunicorn is not installed or not found. Please check your requirements.txt file."
     exit 1
 fi
-
 
 # Run the gunicorn command within the virtual environment
 "$GUNICORN_PATH" -w ${WORKERS} -b 0.0.0.0:${PORT} ${BASENAME}:app
