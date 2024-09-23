@@ -6,17 +6,17 @@ set -e
 # Path to your virtual environment
 VENV_PATH="../.venv"
 
-# Function to ask for user confirmation and install a package
-install_package() {
+# Function to ask for user confirmation and install packages
+install_packages() {
     read -p "$2 not found. Do you want to install $2 using $1? (y/n): " -n 1 -r
     echo # Move to a new line
     if [[ $REPLY =~ ^[Yy]$ ]]; then
         case $1 in
-            apt-get) sudo apt-get update && sudo apt-get install -y $2 ;;
-            yum) sudo yum install -y $2 ;;
-            dnf) sudo dnf install -y $2 ;;
-            pacman) sudo pacman -S --noconfirm $2 ;;
-            brew) brew install $2 ;;
+            apt-get) sudo apt-get update && sudo apt-get install -y $3 ;;
+            yum) sudo yum install -y $3 ;;
+            dnf) sudo dnf install -y $3 ;;
+            pacman) sudo pacman -S --noconfirm $3 ;;
+            brew) brew install $3 ;;
         esac
     else
         echo "Installation aborted."
@@ -24,24 +24,19 @@ install_package() {
     fi
 }
 
-# Function to check if a command exists
-check_command() {
-    command -v "$1" &> /dev/null
-}
-
-# Check if Python3 is installed; if not, determine the package manager and prompt user
-if ! check_command python3; then
-    echo "Python3 is not installed."
-    if check_command apt-get; then
-        install_package "apt-get" "python3"
-    elif check_command yum; then
-        install_package "yum" "python3"
-    elif check_command dnf; then
-        install_package "dnf" "python3"
-    elif check_command pacman; then
-        install_package "pacman" "python"
-    elif check_command brew; then
-        install_package "brew" "python"
+# Check if Python3 or Python is installed
+if ! command -v python3 &> /dev/null && ! command -v python &> /dev/null; then
+    echo "Python is not installed."
+    if command -v apt-get &> /dev/null; then
+        install_packages "apt-get" "python3" "python3"
+    elif command -v yum &> /dev/null; then
+        install_packages "yum" "python3" "python3"
+    elif command -v dnf &> /dev/null; then
+        install_packages "dnf" "python3" "python3"
+    elif command -v pacman &> /dev/null; then
+        install_packages "pacman" "python" "python"
+    elif command -v brew &> /dev/null; then
+        install_packages "brew" "python" "python"
     elif [[ "$OSTYPE" == "msys" ]] || [[ "$OSTYPE" == "win32" ]]; then
         echo "Please install Python manually from https://www.python.org/downloads/windows/"
         exit 1
@@ -50,21 +45,22 @@ if ! check_command python3; then
         exit 1
     fi
 else
-    echo "Python3 is already installed."
+    echo "Python is already installed."
 fi
 
-# Check if pip is installed; if not, prompt for installation
-if ! check_command pip; then
-    if check_command apt-get; then
-        install_package "apt-get" "python3-pip"
-    elif check_command yum; then
-        install_package "yum" "python3-pip"
-    elif check_command dnf; then
-        install_package "dnf" "python3-pip"
-    elif check_command pacman; then
-        install_package "pacman" "python-pip"
-    elif check_command brew; then
-        install_package "brew" "pip"
+# Check if pip is installed
+if ! command -v pip &> /dev/null; then
+    echo "pip not found. Installing pip..."
+    if command -v apt-get &> /dev/null; then
+        install_packages "apt-get" "pip" "python3-pip"
+    elif command -v yum &> /dev/null; then
+        install_packages "yum" "pip" "python3-pip"
+    elif command -v dnf &> /dev/null; then
+        install_packages "dnf" "pip" "python3-pip"
+    elif command -v pacman &> /dev/null; then
+        install_packages "pacman" "pip" "python-pip"
+    elif command -v brew &> /dev/null; then
+        install_packages "brew" "pip" "pip"
     else
         echo "No known package manager found. Please install pip manually."
         exit 1
@@ -73,9 +69,9 @@ else
     echo "pip is already installed."
 fi
 
-# Check if python3-venv is installed (for Debian-based systems)
-if ! dpkg -s python3-venv &> /dev/null && check_command apt-get; then
-    install_package "apt-get" "python3-venv"
+# Check if venv is available (applies only to Debian-based systems)
+if command -v dpkg &> /dev/null && ! dpkg -s python3-venv &> /dev/null; then
+    install_packages "apt-get" "python3-venv" "python3-venv"
 fi
 
 # Create and activate virtual environment if not already present
@@ -84,35 +80,33 @@ if [[ ! -d "$VENV_PATH" ]]; then
     python3 -m venv "$VENV_PATH"
 fi
 
-echo "Activating virtual environment..."
-source "$VENV_PATH/bin/activate"
+# Activate the virtual environment (Windows vs Unix)
+if [[ "$OSTYPE" == "msys" ]] || [[ "$OSTYPE" == "win32" ]]; then
+    source "$VENV_PATH/Scripts/activate"
+else
+    source "$VENV_PATH/bin/activate"
+fi
 
-# Install required packages from requirements.txt (one folder above the current folder)
+# Install required packages from requirements.txt
 REQUIREMENTS_FILE="../requirements.txt"
 if [[ -f "$REQUIREMENTS_FILE" ]]; then
-    echo "Installing packages from $REQUIREMENTS_FILE into the virtual environment..."
+    echo "Installing packages from $REQUIREMENTS_FILE..."
     pip install -r "$REQUIREMENTS_FILE"
 else
-    echo "requirements.txt not found at $REQUIREMENTS_FILE. Please check the file location."
+    echo "requirements.txt not found at $REQUIREMENTS_FILE."
     exit 1
 fi
 
-# Path to your main.py file
+# Start server with gunicorn
 MAIN_PY_PATH="./server.py"
 PORT=5002
-FILENAME=$(basename -- "$MAIN_PY_PATH")
-BASENAME="${FILENAME%.*}"
 WORKERS=4
-echo "Starting server on port ${PORT} with ${WORKERS} workers, through file at ${MAIN_PY_PATH}."
-
-# Get the Gunicorn executable path
 GUNICORN_PATH="$VENV_PATH/bin/gunicorn"
 
-# Check if the Gunicorn executable exists
 if [[ ! -x "$GUNICORN_PATH" ]]; then
-    echo "Gunicorn is not installed or not found. Please check your requirements.txt file."
+    echo "Gunicorn not installed. Please check your requirements.txt."
     exit 1
 fi
 
-# Run the gunicorn command within the virtual environment
-"$GUNICORN_PATH" -w ${WORKERS} -b 0.0.0.0:${PORT} ${BASENAME}:app
+echo "Starting server on port $PORT with $WORKERS workers..."
+"$GUNICORN_PATH" -w $WORKERS -b 0.0.0.0:$PORT "$(basename "$MAIN_PY_PATH" .py):app"
