@@ -9,6 +9,7 @@
         body {
             font-family: 'Arial', sans-serif;
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
             height: 100vh;
@@ -77,6 +78,20 @@
         .button:hover {
             background-color: #4088e7; /* Darker button color on hover */
         }
+        .projects {
+            margin-top: 40px;
+            text-align: center;
+        }
+        .projects h2 {
+            color: #e6edf3; /* Light text color for heading */
+            font-size: 2em;
+            margin-bottom: 20px;
+        }
+        .projects p {
+            color: #b7bfc7; /* Light gray for paragraph text */
+            margin: 20px 0;
+            font-size: 1.1em;
+        }
     </style>
 </head>
 <body>
@@ -91,12 +106,22 @@
             </a>
             <a href="https://www.linkedin.com/in/otso-veistera/" class="link" target="_blank">
                 <svg viewBox="0 0 24 24" aria-hidden="true" role="img">
-                    <!-- LinkedIn SVG Path -->
                     <path d="M2.5 18h3V6.9h-3V18zM4 2c-1 0-1.8.8-1.8 1.8S3 5.6 4 5.6s1.8-.8 1.8-1.8S5 2 4 2zm6.6 6.6V6.9h-3V18h3v-5.7c0-3.2 4.1-3.4 4.1 0V18h3v-6.8c0-5.4-5.7-5.2-7.1-2.6z"/>
                 </svg>
             </a>
         </div>
         <a href="https://github.com/OtsoBear" class="button" target="_blank">Explore GitHub</a>
+    </div>
+    <div class="projects">
+        <h2>My Projects</h2>
+        <p>Here are some of my projects that I've been working on:</p>
+        <a href="/translate" class="link" target="_blank">
+            <img src="{{ url_for('static', filename='latexbird.svg') }}" alt="LaTeX Bird" style="width: 220px; height: 220px; margin-right: -90px;">
+            LaTeX to Calc Translator
+        </a>
+        
+        
+        <!-- Add more project links here as needed -->
     </div>
 </body>
 </html>
