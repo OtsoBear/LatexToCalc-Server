@@ -1,6 +1,6 @@
 name: API Status Badge
 
-permissions: write
+permissions: write-all1
 
 on:
   schedule:
