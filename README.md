@@ -1,6 +1,6 @@
 # <div align="center">LatexToCalc<span style="font-size: medium;">(server)</span></div>
 
-#### <div align="center">A translation engine and webserver for translating LaTeX into a format usable by most calculators, eg. <img src="https://schoolstore.fi/wp-content/uploads/2019/02/ti-nspirecx_cas_ss_icon_lo.png" alt="TI-Nspire CX CAS" width="15" height="15" style="vertical-align: bottom;">TI-Nspire CX CAS.</div>
+### <div align="center">A translation engine and webserver for translating LaTeX into a format usable by most calculators, eg. <img src="https://schoolstore.fi/wp-content/uploads/2019/02/ti-nspirecx_cas_ss_icon_lo.png" alt="TI-Nspire CX CAS" width="15" height="15" style="vertical-align: bottom;">TI-Nspire CX CAS.</div>
 
 ---
 
