@@ -6,6 +6,7 @@
 
 ---
 ![API](https://img.shields.io/badge/Server-Online-brightgreen)
+[![Tests](https://github.com/OtsoBear/LatexToCalc-Server/actions/workflows/python-app.yml/badge.svg?branch=main&event=push)](https://github.com/OtsoBear/LatexToCalc-Server/actions/workflows/python-app.yml)
 
 ### Installation
 
