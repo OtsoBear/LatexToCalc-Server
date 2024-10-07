@@ -29,7 +29,7 @@ jobs:
         run: |
           response=$(curl --write-out "%{http_code}\n" --silent --output /dev/null https://otso.veistera.com/translate)
           echo "Received HTTP response: $response"
-
+      
           if [ "$response" -eq 200 ]; then
             echo "Server Status: Online"
             badge_url="![Server Status](https://img.shields.io/badge/Server-Online-brightgreen)"
@@ -42,12 +42,12 @@ jobs:
           
           # Output status for debugging
           echo "Current server status written to file: $(cat server-status.txt)"
-
+      
           # Debug print to show current content of README.md
           echo "Current content of README.md:"
           cat README.md
-
-          # Use sed to replace the badge if it exists
+      
+          # Check if the badge exists and update it
           if grep -q "!\[Server Status\]" README.md; then
             echo "Server Status badge found in README.md. Replacing with new badge."
             # Replace existing badge using a regex pattern
@@ -59,7 +59,7 @@ jobs:
             echo "$badge_url" >> README.md
             echo "Badge appended to README.md."
           fi
-
+      
           # Debug print to show updated content of README.md
           echo "Updated content of README.md:"
           cat README.md
