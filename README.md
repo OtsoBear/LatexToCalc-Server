@@ -52,3 +52,4 @@ Nginx functions as a reverse proxy, routing incoming traffic to the Flask applic
 
 ---
 
+![Server Status](https://img.shields.io/badge/Server-Offline-red)
