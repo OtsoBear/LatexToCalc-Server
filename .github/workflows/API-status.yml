@@ -1,5 +1,7 @@
 name: API Status Badge
 
+permissions: write
+
 on:
   schedule:
     - cron: '*/5 * * * *'  # Runs every 5 minutes
@@ -10,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Check API Status and Create Badge
         id: api_status
@@ -33,8 +35,13 @@ jobs:
 
       - name: Commit changes
         run: |
-          git config --global user.email "otso.veistera@gmail.com"
-          git config --global user.name "OtsoBear"
-          git add api-status-badge.md api-status.txt
-          git commit -m "Update API status badge"
-          git push || echo "No changes to commit."
+          git config --global user.name 'Otso Veisterä'
+          git config --global user.email 'otso.veistera@gmail.com'
+
+          # Check if there are changes to commit
+          if [[ -n $(git status --porcelain) ]]; then
+            git add api-status-badge.md api-status.txt
+            git commit -m "Update API status badge"
+            git push
+          else
+            echo "No changes to commit."
