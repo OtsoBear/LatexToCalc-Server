@@ -13,8 +13,8 @@
 3. Execute the `start.sh` script to automate the setup of a virtual environment and install dependencies.
 
 ### Overview
-
-This Flask-based web application serves as a powerful API for translating LaTeX expressions into calculator-friendly formats. For instance, the LaTeX `\frac{3}{2}` translates to `((3)/(2))`, streamlining input for popular calculator interfaces.
+This Flask-based web application serves as a powerful API for translating ${\LaTeX}$ 
+ expressions into calculator-friendly formats. For instance, the expression $\frac{3}{2}$, or `\frac{3}{2}`  translates to `((3)/(2))`, streamlining input for popular calculator interfaces.
 
 ### Technical Highlights
 
