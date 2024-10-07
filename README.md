@@ -6,7 +6,7 @@
 
 ---
 ![API](https://img.shields.io/badge/Server-Online-brightgreen)
-[![Tests](https://github.com/OtsoBear/LatexToCalc-Server/actions/workflows/python-app.yml/badge.svg?branch=main&event=push)](https://github.com/OtsoBear/LatexToCalc-Server/actions/workflows/python-app.yml)
+
 
 ### Installation
 
@@ -30,6 +30,9 @@ This Flask-based web application serves as a powerful API for translating ${\LaT
 
 - **Parallel Processing**: Uses Gunicorn to run multiple worker processes, allowing for concurrent handling of translation requests and optimizing response times under load.
 
+### Continuous Integration (CI)
+- **GitHub Actions automatically runs unit tests whenever changes are pushed to GitHub. This ensures that the codebase remains functional and reliable while quickly identifying any issues introduced by recent changes.** The most recent status of those tests are right below.
+[![Tests](https://github.com/OtsoBear/LatexToCalc-Server/actions/workflows/Tests.yml/badge.svg?branch=main&event=push)](https://github.com/OtsoBear/LatexToCalc-Server/actions/workflows/Tests.yml)
 ### API Endpoints
 
 - **Index Route (`/`)**: Serves the main HTML interface for user interactions.
@@ -48,5 +51,3 @@ The application includes error handling to provide helpful messages when issues 
 Nginx functions as a reverse proxy, routing incoming traffic to the Flask application. The Flask app processes requests through the local `translateLatex` module and returns complete responses, ensuring efficient resource utilization and scalability.
 
 ---
-
-![Server Status](https://img.shields.io/badge/Server-Online-brightgreen)
