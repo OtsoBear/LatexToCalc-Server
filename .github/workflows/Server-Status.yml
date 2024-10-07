@@ -47,7 +47,7 @@ jobs:
           echo "Current content of README.md:"
           cat README.md
       
-          # Check if the badge exists and update it
+          # Use sed to replace the badge if it exists
           if grep -q "!\[Server Status\]" README.md; then
             echo "Server Status badge found in README.md. Replacing with new badge."
             # Replace existing badge using a regex pattern
@@ -63,6 +63,7 @@ jobs:
           # Debug print to show updated content of README.md
           echo "Updated content of README.md:"
           cat README.md
+
 
       - name: Commit changes
         run: |
