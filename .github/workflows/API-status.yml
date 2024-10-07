@@ -35,7 +35,7 @@ jobs:
 
       - name: Commit changes
         run: |
-          git config --global user.name 'Otso Veisterä'
+          git config --global user.name 'OtsoBear'
           git config --global user.email 'otso.veistera@gmail.com'
 
           # Check if there are changes to commit
@@ -45,3 +45,4 @@ jobs:
             git push
           else
             echo "No changes to commit."
+          fi
