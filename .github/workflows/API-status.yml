@@ -1,53 +1,48 @@
 name: API Status Badge
 
+permissions: write-all
+
 on:
   schedule:
     - cron: '*/5 * * * *'  # Runs every 5 minutes
-  workflow_dispatch:  # Allows manual triggering
+  workflow_dispatch:  # Allows manual triggering of the workflow
 
 jobs:
   check-api-status:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
-      - name: Check API Status
+      - name: Check API Status and Create Badge
         id: api_status
         run: |
           response=$(curl --write-out "%{http_code}\n" --silent --output /dev/null https://otso.veistera.com/translate)
+          echo "Received HTTP response: $response"
+
           if [ "$response" -eq 200 ]; then
+            echo "API Status: Online"
             echo "![API Status](https://img.shields.io/badge/API%20Status-Online-brightgreen)" > api-status-badge.md
             echo "online" > api-status.txt
           else
+            echo "API Status: Offline (HTTP Code: $response)"
             echo "![API Status](https://img.shields.io/badge/API%20Status-Offline-red)" > api-status-badge.md
             echo "offline" > api-status.txt
           fi
-
-      - name: Check if status has changed
-        id: status_check
-        run: |
-          if [ -f api-status.txt ]; then
-            last_status=$(cat api-status.txt)
-          else
-            last_status="unknown"
-          fi
-
-          current_status=$(cat api-status.txt)
           
-          if [ "$last_status" != "$current_status" ]; then
-            echo "Status changed"
-            echo "changed" > change.txt
-          else
-            echo "No status change"
-            echo "unchanged" > change.txt
-          fi
+          # Output status for debugging
+          echo "Current API status written to file: $(cat api-status.txt)"
 
-      - name: Commit changes if status changed
-        if: steps.status_check.outputs.change == 'changed'
+      - name: Commit changes
         run: |
-          git config --global user.email "you@example.com"  # Replace with your email
-          git config --global user.name "Your Name"  # Replace with your name
-          git add api-status-badge.md api-status.txt
-          git commit -m "Update API status badge"
-          git push
+          git config --global user.name 'OtsoBear'
+          git config --global user.email 'otso.veistera@gmail.com'
+
+          # Check if there are changes to commit
+          if [[ -n $(git status --porcelain) ]]; then
+            git add api-status-badge.md api-status.txt
+            git commit -m "Update API status badge"
+            git push
+          else
+            echo "No changes to commit."
+          fi
