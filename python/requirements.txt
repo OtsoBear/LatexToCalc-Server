@@ -3,3 +3,4 @@ Flask_Cors==4.0.1
 pytest==8.3.2
 regex==2024.5.10
 gunicorn==22.0.0
+flake8==7.1.1
