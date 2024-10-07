@@ -3,6 +3,7 @@ name: API Status Badge
 on:
   schedule:
     - cron: '*/5 * * * *'  # Runs every 5 minutes
+  workflow_dispatch:  # Allows manual triggering
 
 jobs:
   check-api-status:
@@ -45,8 +46,8 @@ jobs:
       - name: Commit changes if status changed
         if: steps.status_check.outputs.change == 'changed'
         run: |
-          git config --global user.email "otso.veistera@gmail.com"  # Replace with your email
-          git config --global user.name "OtsoBear"  # Replace with your name
+          git config --global user.email "you@example.com"  # Replace with your email
+          git config --global user.name "Your Name"  # Replace with your name
           git add api-status-badge.md api-status.txt
           git commit -m "Update API status badge"
           git push
