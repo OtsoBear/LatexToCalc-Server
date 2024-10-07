@@ -15,6 +15,15 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
+      - name: Configure Git
+        run: |
+          git config --global user.name 'OtsoBear'
+          git config --global user.email 'otso.veistera@gmail.com'
+
+      - name: Pull latest changes
+        run: |
+          git pull origin main
+
       - name: Check Server Status and Create Badge
         id: server_status
         run: |
@@ -57,9 +66,6 @@ jobs:
 
       - name: Commit changes
         run: |
-          git config --global user.name 'OtsoBear'
-          git config --global user.email 'otso.veistera@gmail.com'
-
           # Check if there are changes to commit
           if [[ -n $(git status --porcelain) ]]; then
             git add server-status.txt README.md  # Add README.md to the commit
