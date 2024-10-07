@@ -51,3 +51,4 @@ The application includes error handling to provide helpful messages when issues 
 Nginx functions as a reverse proxy, routing incoming traffic to the Flask application. The Flask app processes requests through the local `translateLatex` module and returns complete responses, ensuring efficient resource utilization and scalability.
 
 ---
+![Server Status](https://img.shields.io/badge/Server-Offline-red)
