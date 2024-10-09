@@ -47,22 +47,6 @@
             outline-offset: 2px; /* Space between the element and the outline */
         }
         
-        .button {
-            padding: 12px 24px;
-            font-size: 16px;
-            color: #e6edf3; /* Light text color on button */
-            background-color: #1f6feb; /* Standout button color */
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-            text-decoration: none;
-            display: inline-block;
-            margin-top: 20px; /* Add some space above the button */
-        }
-        .button:hover {
-            background-color: #4088e7; /* Darker button color on hover */
-        }
         .popup {
             position: fixed;
             bottom: 20px;
@@ -83,7 +67,6 @@
         <h1>Translate</h1>
         <p>Enter text to translate or use the clipboard.</p>
         <input type="text" id="translateInput" placeholder="Type your expression here..." />
-        <button id="pasteButton" class="button">Paste from Clipboard</button>
         <div id="result"></div>
     </div>
     <div id="popup" class="popup">Copied to clipboard!</div>
@@ -95,22 +78,6 @@
             const text = this.value;
             if (text.includes('\\')) {
                 translate(text); // Call the translate function here
-            }
-        });
-
-        document.getElementById('pasteButton').addEventListener('click', async function() {
-            if (!clipboardAvailable) {
-                alert('Clipboard access is not available in this browser or context.');
-                return;
-            }
-            try {
-                const text = await navigator.clipboard.readText();
-                if (text.includes('\\')) {
-                    document.getElementById('translateInput').value = text;
-                    translate(text); // Automatically translate the clipboard content
-                }
-            } catch (error) {
-                console.error('Failed to read clipboard contents: ', error);
             }
         });
 
