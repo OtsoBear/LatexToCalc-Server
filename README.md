@@ -5,7 +5,8 @@
 ### <div align="center">A translation engine and webserver for translating LaTeX into a format usable by most calculators, eg. <img src="https://schoolstore.fi/wp-content/uploads/2019/02/ti-nspirecx_cas_ss_icon_lo.png" alt="TI-Nspire CX CAS" width="15" height="15" style="vertical-align: bottom;">TI-Nspire CX CAS.</div>
 
 ---
-![API](https://img.shields.io/badge/Server-Online-brightgreen)
+[![Server-Status](https://img.shields.io/website?url=otso.veistera.com&up_message=online&up_color=green&down_message=offline&down_color=red&style=flat&label=server
+)](https://otso.veistera.com)
 
 
 ### Installation
@@ -50,5 +51,4 @@ The application includes error handling to provide helpful messages when issues 
 
 Nginx functions as a reverse proxy, routing incoming traffic to the Flask application. The Flask app processes requests through the local `translateLatex` module and returns complete responses, ensuring efficient resource utilization and scalability.
 
----
-![Server Status](https://img.shields.io/badge/Server-Online-brightgreen)
+--- 
