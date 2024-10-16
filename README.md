@@ -21,7 +21,7 @@ This Flask-based web application serves as a powerful API for translating ${\LaT
 
 ### Technical Highlights
 
-- **Flask Framework**: Utilizes Flask for a lightweight and flexible web application architecture, enabling low latency interaction.
+- **Flask Framework**: Utilizes Flask to build an Aaynchronous and lightweight web application architecture, designed to provide a REST API with low-latency interactions.
   
 - **Advanced Logging Mechanism**: Implements a dual logging system with separate log files for general and error logs, enhancing traceability and debugging. Logs include timestamps and performance statistic for improved context.
 
@@ -34,14 +34,18 @@ This Flask-based web application serves as a powerful API for translating ${\LaT
 ### Continuous Integration (CI)
 - **GitHub Actions automatically runs unit tests whenever changes are pushed to GitHub. This ensures that the codebase remains functional and reliable while quickly identifying any issues introduced by recent changes.** The most recent status of those tests are right below.
 [![Tests](https://github.com/OtsoBear/LatexToCalc-Server/actions/workflows/Tests.yml/badge.svg?branch=main&event=push)](https://github.com/OtsoBear/LatexToCalc-Server/actions/workflows/Tests.yml)
-### API Endpoints
 
-- **Index Route (`/`)**: Serves the main HTML interface for user interactions.
-  
+### REST API Endpoints
+
+This API uses the REST (Representational State Transfer) architecture for handling LaTeX translation requests through structured HTTP methods like POST and OPTIONS.
+
 - **Translation Endpoint (`/translate`)**:
-  - **POST**: Accepts JSON input for LaTeX expressions, configurable through various settings to optimize output. Execution time and the original request are logged for performance insights.
-  - **GET**: Renders a dedicated translation page for user-friendly LaTeX input.
-  - **OPTIONS**: Responds to CORS preflight requests, enabling checks for permissions before processing more complex requests.
+  - **POST**: Accepts LaTeX formulas from the associated Chrome Extension and provides customization options for the output. It logs execution time and the original request for performance tracking.
+  - **OPTIONS**: Manages CORS preflight requests, ensuring proper permissions before processing more complex interactions.
+
+### Non-RESTful Routes
+
+- **Index Route (`/`)**: Serves the main HTML interface for user interactions, providing a front-end page for accessing the service.
 
 ### Error Management
 
@@ -52,4 +56,3 @@ The application includes error handling to provide helpful messages when issues 
 Nginx functions as a reverse proxy, routing incoming traffic to the Flask application. The Flask app processes requests through the local `translateLatex` module and returns complete responses, ensuring efficient resource utilization and scalability.
 
 --- 
-![Server Status](https://img.shields.io/badge/Server-Online-brightgreen)
