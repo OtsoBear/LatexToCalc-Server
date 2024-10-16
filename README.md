@@ -5,7 +5,7 @@
 ### <div align="center">A translation engine and webserver for translating LaTeX into a format usable by most calculators, eg. <img src="https://schoolstore.fi/wp-content/uploads/2019/02/ti-nspirecx_cas_ss_icon_lo.png" alt="TI-Nspire CX CAS" width="15" height="15" style="vertical-align: bottom;">TI-Nspire CX CAS.</div>
 
 ---
-[![Server-Status](https://img.shields.io/website?url=otso.veistera.com&up_message=online&up_color=green&down_message=offline&down_color=red&style=flat&label=server
+[![Server-Status](https://img.shields.io/website?url=https%3A%2F%2Fotso.veistera.com&up_message=online&down_message=offline&style=flat&label=server
 )](https://otso.veistera.com)
 
 
