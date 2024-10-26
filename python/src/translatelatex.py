@@ -1422,7 +1422,6 @@ class LaTeX2CalcEngine:
                 
         # cross product        
         if vector:
-            print(expression)
             for i in range(expression.count('`') // 2):
                 match = re.search(r'\`(\d+)\`\[(.+)\]\`\1\`\*ΦcrossΦ\`(\d+)\`\[(.+)\]\`\3\`', expression)
                 if match:
@@ -1434,7 +1433,6 @@ class LaTeX2CalcEngine:
 
         # \bar£1£{u}£1£*ΦcrossΦ\bar£2£{v}£2£
         for i in range(expression.count('\\bar') // 2):
-            print(expression)
             match = re.search(r'\\bar\£(\d+)\£\{(.+)\}\£\1\£\*ΦcrossΦ\\bar\£(\d+)\£\{(.+)\}\£\3\£', expression)
             if match:
                 tag1 = '£' + match.group(1) + '£'
@@ -1444,7 +1442,6 @@ class LaTeX2CalcEngine:
                 expression = expression.replace(f'\\bar{tag1}{vectorA}{tag1}*ΦcrossΦ\\bar{tag2}{vectorB}{tag2}', f'crossP({vectorA},{vectorB})')
 
         for i in range(expression.count('\\overline') // 2):
-            print(expression)
             match = re.search(r'\\overline\£(\d+)\£\{(.+)\}\£\1\£\*ΦcrossΦ\\overline\£(\d+)\£\{(.+)\}\£\3\£', expression)
             if match:
                 tag1 = '£' + match.group(1) + '£'
@@ -1454,7 +1451,6 @@ class LaTeX2CalcEngine:
                 expression = expression.replace(f'\\overline{tag1}{vectorA}{tag1}*ΦcrossΦ\\overline{tag2}{vectorB}{tag2}', f'crossP({vectorA},{vectorB})')
         
         for i in range(expression.count('\\bar')):
-            print(expression)
             match = re.search(r'\\bar\£(\d+)\£\{(.+)\}\£\1\£\*ΦcrossΦ\\overline\£(\d+)\£\{(.+)\}\£\3\£', expression)
             if match:
                 tag1 = '£' + match.group(1) + '£'
@@ -1464,7 +1460,6 @@ class LaTeX2CalcEngine:
                 expression = expression.replace(f'\\bar{tag1}{vectorA}{tag1}*ΦcrossΦ\\overline{tag2}{vectorB}{tag2}', f'crossP({vectorA},{vectorB})')
 
         for i in range(expression.count('\\overline')):
-            print(expression)
             match = re.search(r'\\overline\£(\d+)\£\{(.+)\}\£\1\£\*ΦcrossΦ\\bar\£(\d+)\£\{(.+)\}\£\3\£', expression)
             if match:
                 tag1 = '£' + match.group(1) + '£'
@@ -1484,7 +1479,6 @@ class LaTeX2CalcEngine:
             else:
                 expression = expression.replace('𝕚', f'[1,0]', 1).replace('𝕛', f'[0,1]', 1)
             vector = True
-        print(expression)    
         return expression
 
 
@@ -1573,17 +1567,14 @@ class LaTeX2CalcEngine:
             
             # Replace the old substring with the translated content
             start_index = match.start()
-            print(start_index)
-            print(expression)
+  
             expression = expression[:start_index] + expression[start_index:].replace(old_substring, translated_content, 1)
-            print(expression)
             # Remove the leading underscore before the replaced content
             # Loop left to find the first underscore
             underscore_pos = start_index 
             while expression[underscore_pos] != '_':
                 underscore_pos -= 1
-            print("before", expression[:underscore_pos])
-            print( "after", expression[underscore_pos + 1:] )
+
             expression = expression[:underscore_pos] + expression[underscore_pos + 1:]   
             
 
