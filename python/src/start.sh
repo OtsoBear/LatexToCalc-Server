@@ -35,9 +35,6 @@ check_python() {
             install_packages "pacman" "python" "python"
         elif command -v brew &> /dev/null; then
             install_packages "brew" "python" "python"
-        elif [[ "$OSTYPE" == "msys" ]] || [[ "$OSTYPE" == "win32" ]]; then
-            echo "Please install Python manually from https://www.python.org/downloads/windows/"
-            exit 1
         else
             echo "No known package manager found. Please install Python manually."
             exit 1
@@ -91,12 +88,8 @@ if [[ ! -d "$VENV_PATH" ]]; then
     fi
 fi
 
-# Activate the virtual environment (Windows vs Unix)
-if [[ "$OSTYPE" == "msys" ]] || [[ "$OSTYPE" == "win32" ]]; then
-    source "$VENV_PATH/Scripts/activate"
-else
-    source "$VENV_PATH/bin/activate"
-fi
+# Activate the virtual environment
+source "$VENV_PATH/bin/activate"
 
 # Install required packages from requirements.txt
 REQUIREMENTS_FILE="../requirements.txt"
