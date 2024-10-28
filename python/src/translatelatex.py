@@ -1586,7 +1586,14 @@ class LaTeX2CalcEngine:
         expression = expression.replace("¤", "int_").replace("⁃", "").replace("』", "")
         return expression
 
-
+    def translateLcmGcdPym(self, expression):
+        if "gcd" in expression:
+            expression = expression.replace("gcd*", "gcd")
+        if "lcm" in expression:
+            expression = expression.replace("lcm*", "lcm")
+        if "pym" in expression:
+            expression = expression.replace("pym*", "pym")
+        return expression
 
 def translate(expression, TI_on=True, SC_on=False, constants_on=False, coulomb_on=False, e_on=False, i_on=False, g_on=False):
     engine = LaTeX2CalcEngine(TI_on, SC_on)
@@ -1628,7 +1635,6 @@ def translate(expression, TI_on=True, SC_on=False, constants_on=False, coulomb_o
     
     if g_on:
         expression = expression.replace("g", "_g")
-        # indentattu nyt
         fixG = {
             '\\_': '\\',
             '__gm': '_gm',
@@ -1642,13 +1648,12 @@ def translate(expression, TI_on=True, SC_on=False, constants_on=False, coulomb_o
     expression = expression.replace("left", "").replace("right", "")
     
     if constants_on: expression = expression.replace("h", "_h").replace("%`´%", "_h")
-    # väliaikane korjaus
+    # väliaikanen korjaus
     expression = expression.replace("__hr", "_hr")
     if coulomb_on: expression = expression.replace("k", "_Cc")
     elif constants_on: expression = expression.replace("k", "_k").replace("Ｇ", "_g")
     
-    # lower index
-    #expression = engine.translateLowerIndex(expression)
+
 
     # remove identifiers
     expression = engine.removeIdentifiers(expression)
@@ -1686,7 +1691,7 @@ def translate(expression, TI_on=True, SC_on=False, constants_on=False, coulomb_o
 
     
     # Turn expressions like xy=kc into x*y=k*c
-    # Define characters to permute
+    # Define characters to permutate
     characters = ['x', 'y', 'z', 'a', 'b', 'c', 'k']
 
     # Create regex pattern for permutations of characters
