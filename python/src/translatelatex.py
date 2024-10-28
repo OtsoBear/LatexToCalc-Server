@@ -1744,7 +1744,8 @@ def translate(expression, TI_on=True, SC_on=False, constants_on=False, coulomb_o
     "*@r": "@r",
     "(*": "(",
     "*)": ")",
-    "*°": "°"
+    "*°": "°",
+    "a*bs": "abs"
     }
 
     for old_str, new_str in fixAsterisk.items():
