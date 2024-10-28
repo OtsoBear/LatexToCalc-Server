@@ -1586,14 +1586,7 @@ class LaTeX2CalcEngine:
         expression = expression.replace("¤", "int_").replace("⁃", "").replace("』", "")
         return expression
 
-    def translateLcmGcdPym(self, expression):
-        if "gcd" in expression:
-            expression = expression.replace("gcd*", "gcd")
-        if "lcm" in expression:
-            expression = expression.replace("lcm*", "lcm")
-        if "pym" in expression:
-            expression = expression.replace("pym*", "pym")
-        return expression
+
 
 def translate(expression, TI_on=True, SC_on=False, constants_on=False, coulomb_on=False, e_on=False, i_on=False, g_on=False):
     engine = LaTeX2CalcEngine(TI_on, SC_on)
@@ -1738,6 +1731,9 @@ def translate(expression, TI_on=True, SC_on=False, constants_on=False, coulomb_o
             expression = expression.replace(match + fix, match + "*" + fix)
 
     fixAsterisk = {
+    "lcm*": "lcm",
+    "gcd*": "gcd",
+    "pym*": "pym",
     "*,": ",",
     "*.": ".",
     "*;": ";",
