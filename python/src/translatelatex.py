@@ -1788,7 +1788,6 @@ e_on = False
 i_on = False
 g_on = False
 solve_button_on = False
-ddx_on = False
 constants_on = False
 coulomb_on = False
 
