@@ -8,6 +8,7 @@
 [![Server-Status](https://img.shields.io/website?url=https%3A%2F%2Fotso.veistera.com&up_message=online&down_message=offline&style=flat&label=server
 )](https://otso.veistera.com)
 
+### Frontend Repository: [LatexToCalc Chrome Extension](https://github.com/OtsoBear/LatexToCalc)
 
 ### Installation
 
@@ -32,7 +33,7 @@ This Flask-based web application serves as a powerful API for translating ${\LaT
 - **Parallel Processing**: Uses Gunicorn to run multiple worker processes, allowing for concurrent handling of translation requests and optimizing response times under load.
 
 ### Continuous Integration (CI)
-- **GitHub Actions automatically runs unit tests whenever changes are pushed to GitHub. This ensures that the codebase remains functional and reliable while quickly identifying any issues introduced by recent changes.** The most recent status of those tests are right below.
+- **GitHub Actions automatically runs unit tests whenever changes are pushed to GitHub. This ensures that the codebase remains functional and reliable while quickly identifying any issues introduced by recent changes.** The most recent status of those tests is right here:
 [![Tests](https://github.com/OtsoBear/LatexToCalc-Server/actions/workflows/Tests.yml/badge.svg?branch=main&event=push)](https://github.com/OtsoBear/LatexToCalc-Server/actions/workflows/Tests.yml)
 
 ### REST API Endpoints

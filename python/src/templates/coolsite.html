@@ -1,0 +1,1233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Otso Veisterä | Portfolio</title>
+    <script type="importmap">
+        {
+          "imports": {
+            "three": "https://cdn.jsdelivr.net/npm/three@0.174.0/build/three.module.js"}} 
+    </script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #000;
+            color: #fff;
+            font-family: 'Space Mono', monospace;
+            overflow-x: hidden;
+            height: 400vh;
+            cursor: default;
+            font-size: 14px; /* Reduced base font size */
+            --section-scale: 0.85; /* Global scale factor */
+        }
+        
+        canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: -1;
+        }
+        
+        .section {
+            position: fixed;
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: all 0.8s ease;
+            pointer-events: none;
+            z-index: 1;
+            padding: 0 10px; /* Add padding for better content visibility */
+            box-sizing: border-box; /* Include padding in width calculation */
+            transform: scale(var(--section-scale)); /* Scale down all sections */
+            transform-origin: center center;
+        }
+        
+        .section.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+        
+        .content-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            max-width: 1000px; /* Reduced from 1200px */
+            gap: 15px; /* Further reduced from 20px */
+            padding: 0 5px;
+            margin-top: 15px; /* Reduced from 20px */
+            width: 100%; /* Ensure grid takes full width */
+            box-sizing: border-box; /* Include padding in width calculation */
+            transform-origin: top center;
+        }
+        
+        .grid-item {
+            position: relative;
+            min-height: 180px; /* Reduced from 200px */
+            transform: translateY(30px); /* Less movement */
+            opacity: 0;
+            transition: all 0.9s cubic-bezier(0.23, 1, 0.32, 1);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .section.active .grid-item {
+            transform: translateY(0);
+            opacity: 1;
+            transition-delay: calc(var(--delay) * 0.15s);
+        }
+        
+        .glowing-text {
+            position: relative;
+            display: inline-block;
+            color: #fff;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+            padding: 0 5px;
+        }
+        
+        .glowing-text:after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 1px;
+            bottom: 0;
+            left: 0;
+            background: linear-gradient(90deg, transparent, #a0a0ff, transparent);
+            transition: width 0.5s ease;
+        }
+        
+        .glowing-text:hover:after {
+            width: 100%;
+        }
+        
+        .text-reveal {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .text-reveal:after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, #000, transparent);
+            animation: text-reveal 1.5s forwards;
+            animation-delay: calc(var(--delay) * 0.3s);
+        }
+        
+        @keyframes text-reveal {
+            0% {
+                left: 0;
+                width: 100%;
+            }
+            100% {
+                left: 100%;
+                width: 0;
+            }
+        }
+        
+        h1 {
+            font-size: clamp(2rem, 4vw, 3.5rem); /* Reduced font size */
+            margin: 0 0 5px 0; /* Less margin */
+            letter-spacing: 8px; /* Less letter spacing */
+            text-transform: uppercase;
+            font-weight: 200;
+            text-shadow: 0 0 20px rgba(160, 160, 255, 0.5);
+            line-height: 1.2;
+            text-align: center;
+            opacity: 0.9;
+            background: linear-gradient(90deg, #fff, #a0a0ff, #fff);
+            background-size: 200% auto;
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            animation: shine 8s linear infinite;
+        }
+        
+        @keyframes shine {
+            to {
+                background-position: 200% center;
+            }
+        }
+        
+        .terminal-box {
+            background: rgba(10, 10, 25, 0.75);
+            border: 1px solid rgba(160, 160, 255, 0.3);
+            border-radius: 5px;
+            padding: 15px; /* Reduced from 20px */
+            font-family: 'Space Mono', monospace;
+            color: #a0a0ff;
+            max-width: 100%;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5), 0 0 30px rgba(160, 160, 255, 0.2);
+            transform: perspective(500px) rotateX(3deg); /* Less rotation */
+            transition: all 0.3s ease;
+            backdrop-filter: blur(6px);
+            z-index: 2; /* Ensure terminal boxes appear above constellation */
+            font-size: 0.9rem; /* Slightly smaller font */
+            height: 100%;
+        }
+        
+        .terminal-box:hover {
+            transform: perspective(500px) rotateX(0);
+            border-color: rgba(160, 160, 255, 0.6);
+            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.5), 0 0 40px rgba(160, 160, 255, 0.3);
+        }
+        
+        .terminal-box:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 30px;
+            background: rgba(160, 160, 255, 0.1);
+            border-bottom: 1px solid rgba(160, 160, 255, 0.2);
+            display: flex;
+            align-items: center;
+            padding-left: 10px;
+        }
+        
+        .terminal-content {
+            margin-top: 12px; /* Reduced from 15px */
+            line-height: 1.5; /* Reduced from 1.6 */
+        }
+        
+        .terminal-tag {
+            color: #7a7aea;
+        }
+        
+        .terminal-command {
+            color: #64ff64;
+        }
+        
+        .terminal-string {
+            color: #ff9e64;
+        }
+        
+        .terminal-comment {
+            color: #626262;
+            font-style: italic;
+        }
+        
+        .terminal-output {
+            color: #bababa;
+            margin-left: 20px;
+        }
+        
+        .blink {
+            animation: blink 1s step-end infinite;
+            margin-left: 5px;
+        }
+        
+        @keyframes blink {
+            50% { opacity: 0; }
+        }
+        
+        .constellation {
+            position: absolute; /* Changed from relative to absolute */
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            margin-bottom: 0; /* Removed margin */
+            opacity: 0.5; /* Reduced opacity */
+            z-index: 1; /* Lower z-index than terminal boxes */
+            pointer-events: none; /* Allow clicks to pass through */
+        }
+        
+        .star-point {
+            position: absolute;
+            width: 3px;
+            height: 3px;
+            border-radius: 50%;
+            background-color: #fff;
+            box-shadow: 0 0 8px rgba(160, 160, 255, 0.8);
+            animation: star-pulse 3s infinite;
+            z-index: 1;
+        }
+        
+        .constellation-line {
+            position: absolute;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(160, 160, 255, 0.5), transparent);
+            transform-origin: left center;
+            z-index: 0;
+            opacity: 0.6;
+        }
+        
+        @keyframes star-pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.5); opacity: 0.7; }
+        }
+        
+        .mystery-text {
+            position: relative;
+            margin: 12px 0; /* Reduced from 20px */
+            padding: 12px; /* Reduced from 15px */
+            background: rgba(10, 10, 25, 0.7);
+            border-radius: 5px;
+            border-left: 3px solid #a0a0ff;
+            font-style: italic;
+            color: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(6px);
+            max-width: 700px; /* Reduced from 800px */
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            width: 85%; /* Reduced from 90% */
+            overflow: visible; /* Ensure text doesn't get cut off */
+            z-index: 2; /* Ensure text appears above background elements */
+            font-size: 0.9rem; /* Slightly reduced font size */
+            box-sizing: border-box; /* Include padding in width calculation */
+        }
+        
+        .mystery-text:before {
+            content: """;
+            font-size: 3em; /* Reduced from 4em */
+            position: absolute;
+            top: -15px; /* Adjusted from -20px */
+            left: 10px;
+            color: rgba(160, 160, 255, 0.3);
+        }
+        
+        .mystery-text:after {
+            content: """;
+            font-size: 3em; /* Reduced from 4em */
+            position: absolute;
+            bottom: -45px; /* Adjusted from -60px */
+            right: 10px;
+            color: rgba(160, 160, 255, 0.3);
+        }
+        
+        .skill {
+            display: inline-block;
+            padding: 4px 12px;
+            margin: 4px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            color: #d4d4ff;
+            border: 1px solid rgba(160, 160, 255, 0.3);
+            background-color: rgba(160, 160, 255, 0.15);
+            transition: all 0.3s ease;
+        }
+        
+        .skill:hover {
+            background-color: rgba(160, 160, 255, 0.3);
+            transform: translateY(-2px);
+        }
+        
+        .highlight {
+            color: #a0a0ff;
+            font-weight: normal;
+        }
+        
+        .project-link {
+            text-decoration: none;
+            color: #a0a0ff;
+            display: inline-block;
+            padding: 5px 15px;
+            border: 1px solid rgba(160, 160, 255, 0.3);
+            border-radius: 20px;
+            margin-top: 15px;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+        
+        .project-link:hover {
+            background: rgba(160, 160, 255, 0.1);
+            border-color: rgba(160, 160, 255, 0.6);
+        }
+        
+        /* Navigation dots */
+        .navigation {
+            position: fixed;
+            right: 30px;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .nav-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.3);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .nav-dot:before {
+            content: attr(data-label);
+            position: absolute;
+            right: 25px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.8rem;
+            white-space: nowrap;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+        .nav-dot:hover:before {
+            opacity: 1;
+        }
+        
+        .nav-dot.active {
+            background-color: white;
+            box-shadow: 0 0 10px white;
+        }
+        
+        .scroll-progress {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 0%;
+            height: 2px;
+            background: linear-gradient(90deg, #a0a0ff, white);
+            z-index: 100;
+            transition: width 0.1s;
+        }
+        
+        .scroll-indicator {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.9rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            opacity: 0.7;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 0.3; }
+            50% { opacity: 0.8; }
+            100% { opacity: 0.3; }
+        }
+        
+        .contact-button {
+            display: inline-block;
+            margin-top: 20px; /* Reduced from 30px */
+            padding: 8px 20px; /* Reduced from 10px 25px */
+            background: rgba(10, 10, 25, 0.7);
+            border: 1px solid rgba(160, 160, 255, 0.6);
+            color: #fff;
+            text-decoration: none;
+            font-family: 'Space Mono', monospace;
+            letter-spacing: 2px;
+            border-radius: 30px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+            text-transform: uppercase;
+            font-size: 0.85rem; /* Reduced from 0.9rem */
+        }
+        
+        .contact-button:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(160, 160, 255, 0.3), transparent);
+            transition: all 0.6s ease;
+            z-index: -1;
+        }
+        
+        .contact-button:hover:before {
+            left: 100%;
+        }
+        
+        .contact-button:hover {
+            box-shadow: 0 0 15px rgba(160, 160, 255, 0.5);
+            border-color: rgba(160, 160, 255, 0.8);
+        }
+        
+        @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap');
+        
+        /* Add media queries for better responsiveness */
+        @media screen and (max-width: 768px) {
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            h1 {
+                letter-spacing: 5px;
+            }
+            
+            .mystery-text {
+                width: 95%;
+                padding: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Scroll progress indicator -->
+    <div class="scroll-progress" id="scroll-progress"></div>
+    
+    <!-- Navigation dots -->
+    <div class="navigation">
+        <div class="nav-dot active" data-section="0" data-label="Identity"></div>
+        <div class="nav-dot" data-section="1" data-label="Experience"></div>
+        <div class="nav-dot" data-section="2" data-label="Creations"></div>
+        <div class="nav-dot" data-section="3" data-label="Connection"></div>
+    </div>
+    
+    <!-- Content sections -->
+    <section class="section active" id="section0" data-depth="0">
+        <h1>Otso Veisterä</h1>
+        
+        <div class="mystery-text text-reveal" style="--delay: 1">
+            <span class="highlight">Explorer of digital frontiers.</span> Creating solutions at the intersection of science and code. Fluent in Finnish and English (C2), mathematics and machine learning.
+        </div>
+        
+        <div class="content-grid">
+            <div class="grid-item" style="--delay: 2">
+                <div class="terminal-box">
+                    <div class="terminal-content">
+                        <span class="terminal-command">$ whoami</span><br>
+                        <span class="terminal-output">software_developer & student</span><br><br>
+                        
+                        <span class="terminal-command">$ cat skills.txt</span><br>
+                        <span class="terminal-output">
+                            <span class="skill">Programming</span>
+                            <span class="skill">Machine Learning</span>
+                            <span class="skill">Python</span>
+                            <span class="skill">Problem Solving</span>
+                            <span class="skill">Rust</span>
+                        </span><br><br>
+                        
+                        <span class="terminal-command">$ echo $achievements</span><br>
+                        <span class="terminal-output">
+                            - Coder of The Year<br>
+                            - Young Innovator<br>
+                            - Best Physics Report in Finland<br>
+                        </span><br>
+                        
+                        <span class="terminal-comment">// Constantly exploring new technologies</span><br>
+                        <span class="terminal-command">$ find . -name "curiosity"</span><span class="blink">_</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="grid-item" style="--delay: 3">
+                <!-- Moved constellation inside terminal box for better layout -->
+                <div class="terminal-box">
+                    <div class="constellation" id="constellation"></div>
+                    <div class="terminal-content">
+                        <span class="terminal-tag">&lt;approach&gt;</span><br>
+                        <span class="terminal-output">
+                            I combine analytical thinking with creative problem-solving, seeking elegant and efficient solutions.
+                        </span><br>
+                        <span class="terminal-tag">&lt;/approach&gt;</span><br><br>
+                        
+                        <span class="terminal-tag">&lt;philosophy&gt;</span><br>
+                        <span class="terminal-output">
+                            Technology should solve real problems, not just exist for its own sake.
+                        </span><br>
+                        <span class="terminal-tag">&lt;/philosophy&gt;</span><br><br>
+                        
+                        <span class="terminal-string">"Knowledge is assembling pieces of a puzzle you've never seen completed."</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <a href="#" class="contact-button" onclick="scrollToSection(3); return false;">Discover More</a>
+    </section>
+    
+    <section class="section" id="section1" data-depth="1">
+        <h1>Experience</h1>
+        
+        <div class="mystery-text text-reveal" style="--delay: 1">
+            <span class="highlight">Translating concepts into reality.</span> From AI development to teaching the next generation of coders, each experience has been a step toward mastery.
+        </div>
+        
+        <div class="content-grid">
+            <div class="grid-item" style="--delay: 2">
+                <div class="terminal-box">
+                    <div class="terminal-content">
+                        <span class="terminal-command">$ cat experience.log | head</span><br><br>
+                        
+                        <span class="terminal-tag">[Planmeca]</span> <span class="terminal-comment">// Jun-Jul 2024</span><br>
+                        <span class="terminal-output">
+                            Developed AI for 3D medical imaging<br>
+                            PyTorch-based segmentation model<br>
+                            Improved diagnostic workflows
+                        </span><br>
+                        
+                        <span class="terminal-tag">[4H Federation]</span> <span class="terminal-comment">// Jul 2023</span><br>
+                        <span class="terminal-output">
+                            Led youth development programs<br>
+                            Created engaging learning experiences
+                        </span><br>
+                        
+                        <span class="terminal-tag">[City of Espoo]</span> <span class="terminal-comment">// Jun 2022</span><br>
+                        <span class="terminal-output">
+                            Taught programming through Minecraft<br>
+                            Translated complex concepts for young minds
+                        </span><br>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="grid-item" style="--delay: 3">
+                <div class="terminal-box">
+                    <div class="terminal-content">
+                        <span class="terminal-command">$ grep -A 3 "achievement" career.json</span><br>
+                        <span class="terminal-output">
+                            {<br>
+                            &nbsp;&nbsp;"highlight": "33 bugs identified in one week",<br>
+                            &nbsp;&nbsp;"location": "Planmeca internship",<br>
+                            &nbsp;&nbsp;"skill": "Exceptional attention to detail"<br>
+                            }<br><br>
+                            {<br>
+                            &nbsp;&nbsp;"highlight": "Electronics & microcontroller development",<br>
+                            &nbsp;&nbsp;"location": "Aalto Design Factory",<br>
+                            &nbsp;&nbsp;"skill": "Hardware-software integration"<br>
+                            }<br>
+                        </span><br>
+                        
+                        <span class="terminal-command">$ git log --author="Otso" --pretty=format:"%h - %s"</span><span class="blink">_</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <section class="section" id="section2" data-depth="2">
+        <h1>Projects</h1>
+        
+        <div class="mystery-text text-reveal" style="--delay: 1">
+            <span class="highlight">Ideas materialized through code.</span> Each project represents a challenge overcome, a problem solved, and knowledge gained.
+        </div>
+        
+        <div class="content-grid">
+            <div class="grid-item" style="--delay: 2">
+                <div class="terminal-box">
+                    <div class="terminal-content">
+                        <span class="terminal-tag">[LatexToCalc]</span><br>
+                        <span class="terminal-output">
+                            Translating mathematical language across platforms<br>
+                            <br>
+                            <span class="terminal-comment">// Backend</span><br>
+                            Flask-based translation server<br>
+                            REST API with multi-endpoint architecture<br>
+                            CI/CD with GitHub Actions<br>
+                            <br>
+                            <span class="terminal-comment">// Frontend</span><br>
+                            Chrome extension for seamless integration<br>
+                            User-friendly interface for formula conversion
+                        </span><br>
+                        
+                        <span class="terminal-string">
+                            "Making complex expressions accessible everywhere."
+                        </span><br>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="grid-item" style="--delay: 3">
+                <div class="terminal-box">
+                    <div class="terminal-content">
+                        <span class="terminal-tag">[Rustful Raytracer]</span><br>
+                        <span class="terminal-output">
+                            High-performance graphics engine built in Rust<br>
+                            <br>
+                            <span class="terminal-comment">// Features</span><br>
+                            Multi-threaded rendering<br>
+                            Realistic material simulation<br>
+                            Reflection & refraction physics<br>
+                            Mathematical optics modeling<br>
+                        </span><br>
+                        
+                        <span class="terminal-command">$ ./measure_performance.sh</span><br>
+                        <span class="terminal-output">
+                            Render time: [██████████] 100%<br>
+                            Quality: Photorealistic<br>
+                            Status: Optimized
+                        </span><br>
+                        
+                        <a href="#" class="project-link">View Projects</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <section class="section" id="section3" data-depth="3">
+        <h1>Connect</h1>
+        
+        <div class="mystery-text text-reveal" style="--delay: 1">
+            <span class="highlight">The journey continues.</span> Currently studying in the selective Data (LuMa) program at Otaniemen Lukio, exploring advanced mathematics and physics while leading multiple student initiatives.
+        </div>
+        
+        <div class="content-grid">
+            <div class="grid-item" style="--delay: 2">
+                <div class="terminal-box">
+                    <div class="terminal-content">
+                        <span class="terminal-command">$ cat education.md</span><br>
+                        <span class="terminal-output">
+                            <span class="terminal-tag"># Otaniemen Lukio (2023-2026)</span><br>
+                            Data (Natural Sciences & Mathematics) program<br>
+                            Selected from hundreds of applicants<br><br>
+                            
+                            <span class="terminal-comment">## Leadership Roles</span><br>
+                            - Vice President & Website Editor, Datat Ry Board<br>
+                            - Website Manager, Olarfest Board<br>
+                            - Technician, Audio Visual Team<br>
+                            - Trailer Lead & Scriptwriter, Dataleffa<br>
+                        </span><br>
+                        
+                        <span class="terminal-command">$ echo $future_interests</span><br>
+                        <span class="terminal-output">
+                            AI Research, Computer Vision, Physics Simulation
+                        </span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="grid-item" style="--delay: 3">
+                <div class="terminal-box">
+                    <div class="terminal-content">
+                        <span class="terminal-command">$ whois otso</span><br>
+                        <span class="terminal-output">
+                            <span class="terminal-comment">// Contact Information</span><br>
+                            Email: <a href="mailto:otso.veistera@gmail.com" class="glowing-text">otso.veistera@gmail.com</a><br>
+                            LinkedIn: <a href="https://www.linkedin.com/in/otso-veistera" class="glowing-text" target="_blank">otso-veistera</a><br>
+                            Location: Espoo, Finland<br><br>
+                        </span>
+                        
+                        <span class="terminal-string">"The most interesting challenges are yet to come."</span><br><br>
+                        
+                        <span class="terminal-command">$ ssh future@otso.connect</span><br>
+                        <span class="terminal-output">
+                            Establishing connection...<span class="blink">_</span>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <a href="https://www.linkedin.com/in/otso-veistera" class="contact-button" target="_blank">Connect on LinkedIn</a>
+    </section>
+    
+    <div class="scroll-indicator">Scroll to explore</div>
+    
+    <script type="module">
+        import * as THREE from 'three';
+        // Scene setup
+        let renderer, scene, camera;
+        let particles = [];
+        let timer = {
+            lastTime: 0,
+            frameInterval: 1000 / 30, // Reduced to 30 FPS for better performance
+            getDelta: function(currentTime) {
+                const elapsed = currentTime - this.lastTime;
+                this.lastTime = currentTime - (elapsed % this.frameInterval);
+                return elapsed;
+            }
+        };
+        
+        // Render state management
+        let needsRender = true;
+        let lastInteraction = Date.now();
+        const IDLE_THRESHOLD = 5000; // Time in ms before reducing render frequency
+        
+        // Scroll variables
+        let scrollY = 0;
+        let currentSection = 0;
+        let targetSection = 0;
+        
+        // Section positions in 3D space - distribute more evenly and reduce distances
+        const sectionCoordinates = [
+            { x: 0, y: 0, z: 0 },
+            { x: 100, y: 20, z: -100 },
+            { x: -80, y: -30, z: -200 },
+            { x: 0, y: 0, z: -300 }
+        ];
+        
+        // Initialize with performance options
+        function init() {
+            // Create constellation effect
+            createConstellation();
+            
+            // Detect device capabilities and adjust settings
+            const isLowEndDevice = navigator.hardwareConcurrency <= 4 || 
+                                  navigator.userAgent.match(/Android|webOS|iPhone|iPad|iPod|BlackBerry/i);
+            
+            // Create renderer with performance optimizations
+            renderer = new THREE.WebGLRenderer({ 
+                antialias: false,
+                alpha: true,
+                powerPreference: "high-performance",
+                precision: "lowp" // Use low precision for even better performance
+            });
+            
+            // Render at lower resolution for better performance
+            const resolutionScale = isLowEndDevice ? 0.5 : 0.75;
+            renderer.setSize(window.innerWidth * resolutionScale, window.innerHeight * resolutionScale);
+            renderer.domElement.style.width = '100%';
+            renderer.domElement.style.height = '100%';
+            
+            renderer.setPixelRatio(1); // Fixed pixel ratio for consistent performance
+            document.body.appendChild(renderer.domElement);
+            
+            // Create scene
+            scene = new THREE.Scene();
+            
+            // Create camera with adjusted parameters for better zoom level
+            camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 2000);
+            camera.position.set(0, 0, 50);
+            
+            // Create particles - OPTIMIZED VERSION
+            createOptimizedStars(isLowEndDevice);
+            
+            // Setup event listeners
+            setupEventListeners();
+            
+            // Start animation loop with throttling for performance
+            animateWithThrottling();
+            
+            // Initial section activation
+            updateSectionVisibility();
+            
+            // Make sure text is visible initially
+            ensureTextVisibility();
+            
+            // Check if desktop or mobile and apply appropriate scaling
+            applyDeviceSpecificScaling();
+        }
+        
+        // Optimized star creation function
+        function createOptimizedStars(isLowEndDevice) {
+            // Adjust star count based on device capability
+            const totalStars = isLowEndDevice ? 500 : 800;
+            
+            // Create a sprite-based material which is more efficient
+            const starTexture = createStarTexture();
+            const material = new THREE.PointsMaterial({
+                size: isLowEndDevice ? 1.2 : 0.8, // Larger but fewer stars on low-end devices
+                map: starTexture,
+                transparent: true,
+                opacity: 0.7,
+                depthWrite: false,
+                blending: THREE.AdditiveBlending,
+                sizeAttenuation: true
+            });
+            
+            // Create one large geometry instead of multiple small ones
+            const geometry = new THREE.BufferGeometry();
+            const positions = new Float32Array(totalStars * 3);
+            
+            // Define the bounds of our 3D space
+            const bounds = {
+                x: [-250, 250],
+                y: [-150, 150],
+                z: [-500, 50]
+            };
+            
+            // Distribute stars randomly within bounds
+            for (let i = 0; i < totalStars; i++) {
+                const i3 = i * 3;
+                positions[i3] = Math.random() * (bounds.x[1] - bounds.x[0]) + bounds.x[0];
+                positions[i3 + 1] = Math.random() * (bounds.y[1] - bounds.y[0]) + bounds.y[0];
+                positions[i3 + 2] = Math.random() * (bounds.z[1] - bounds.z[0]) + bounds.z[0];
+            }
+            
+            geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+            
+            // Create a single particle system
+            const stars = new THREE.Points(geometry, material);
+            scene.add(stars);
+            
+            // Store for animation
+            particles.push({
+                system: stars,
+                speed: 0.02,
+                originalPositions: positions.slice()
+            });
+        }
+        
+        // Create optimized star texture
+        function createStarTexture() {
+            const canvas = document.createElement('canvas');
+            canvas.width = 4;  // Ultra-small texture size for maximum performance
+            canvas.height = 4;
+            
+            const ctx = canvas.getContext('2d');
+            
+            // Simple 4x4 pixel gradient - even more optimized
+            ctx.fillStyle = 'white';
+            ctx.fillRect(0, 0, 4, 4);
+            
+            // Create a simple radial gradient manually
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+            ctx.fillRect(0, 0, 1, 1);
+            ctx.fillRect(0, 3, 1, 1);
+            ctx.fillRect(3, 0, 1, 1);
+            ctx.fillRect(3, 3, 1, 1);
+            
+            ctx.fillStyle = 'rgba(255, 255, 255, 0)';
+            ctx.fillRect(0, 0, 1, 1);
+            
+            const texture = new THREE.CanvasTexture(canvas);
+            texture.needsUpdate = true;
+            
+            // Optimize texture settings
+            texture.generateMipmaps = false;
+            texture.minFilter = THREE.NearestFilter;
+            texture.magFilter = THREE.NearestFilter;
+            
+            return texture;
+        }
+
+        // Setup event listeners with interaction tracking
+        function setupEventListeners() {
+            // Track user interactions to adjust render frequency
+            const trackInteraction = () => {
+                lastInteraction = Date.now();
+                needsRender = true;
+            };
+
+            // Handle window resize
+            window.addEventListener('resize', () => {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                
+                const isLowEndDevice = navigator.hardwareConcurrency <= 4 || 
+                                     navigator.userAgent.match(/Android|webOS|iPhone|iPad|iPod|BlackBerry/i);
+                const resolutionScale = isLowEndDevice ? 0.5 : 0.75;
+                renderer.setSize(window.innerWidth * resolutionScale, window.innerHeight * resolutionScale);
+                
+                trackInteraction();
+            });
+            
+            // Handle scroll events with fixed section visibility
+            window.addEventListener('scroll', () => {
+                // Get scroll position
+                scrollY = window.scrollY;
+                const maxScroll = document.body.scrollHeight - window.innerHeight;
+                const scrollPercent = (scrollY / maxScroll) * 100;
+                
+                // Update scroll progress indicator
+                document.getElementById('scroll-progress').style.width = `${scrollPercent}%`;
+                
+                // Calculate current section based on scroll position
+                const windowHeight = window.innerHeight;
+                targetSection = Math.round(scrollY / windowHeight);
+                
+                // Clamp to valid section range
+                targetSection = Math.max(0, Math.min(3, targetSection));
+                
+                // Update navigation dots
+                updateNavigation();
+                
+                // Update section visibility - show one section at a time
+                updateSectionVisibility();
+                
+                // Hide scroll indicator after scrolling begins
+                if (scrollY > 100) {
+                    document.querySelector('.scroll-indicator').style.opacity = '0';
+                }
+                
+                trackInteraction();
+            });
+            
+            // Track other user interactions
+            window.addEventListener('mousemove', trackInteraction);
+            window.addEventListener('click', trackInteraction);
+            window.addEventListener('keydown', trackInteraction);
+            window.addEventListener('touchstart', trackInteraction);
+            
+            // Handle navigation dot clicks
+            document.querySelectorAll('.nav-dot').forEach(dot => {
+                dot.addEventListener('click', () => {
+                    const sectionIndex = parseInt(dot.dataset.section);
+                    scrollToSection(sectionIndex);
+                    trackInteraction();
+                });
+            });
+            
+            // Update section visibility on page load and resize
+            window.addEventListener('load', updateSectionVisibility);
+            window.addEventListener('resize', updateSectionVisibility);
+        }
+        
+        // Throttled animation for better performance
+        function animateWithThrottling(currentTime = 0) {
+            requestAnimationFrame(animateWithThrottling);
+            
+            // Check if we need to render based on activity state
+            const timeSinceInteraction = Date.now() - lastInteraction;
+            const isIdle = timeSinceInteraction > IDLE_THRESHOLD;
+            
+            // When idle, only render every 10th frame
+            if (isIdle && currentTime % 300 !== 0 && !needsRender) {
+                return;
+            }
+            
+            // Skip frames to maintain performance using our timer
+            const elapsed = timer.getDelta(currentTime);
+            if (elapsed < timer.frameInterval) return;
+            
+            // Only render if the page is visible
+            if (document.visibilityState !== 'hidden') {
+                // Perform animation
+                moveCamera();
+                
+                // Use a simpler animation when idle
+                if (isIdle) {
+                    animateStarsSimple();
+                } else {
+                    animateStars();
+                }
+                
+                renderer.render(scene, camera);
+            }
+            
+            needsRender = false;
+        }
+        
+        // Optimized star animation
+        function animateStars() {
+            particles.forEach(particle => {
+                const { system, speed, originalPositions } = particle;
+                const positions = system.geometry.attributes.position.array;
+                
+                // Only update every 8th star per frame for better performance
+                const updateCount = Math.floor(positions.length / 24); 
+                const startOffset = Math.floor(Math.random() * 8);
+                
+                for (let i = startOffset; i < positions.length / 3; i += 8) {
+                    const i3 = i * 3;
+                    
+                    // Apply simple z-axis movement
+                    positions[i3 + 2] += speed * (0.5 + Math.random() * 0.5);
+                    
+                    // Reset stars that move too far
+                    if (positions[i3 + 2] > 50) {
+                        positions[i3] = originalPositions[i3] + (Math.random() - 0.5) * 50;
+                        positions[i3 + 1] = originalPositions[i3 + 1] + (Math.random() - 0.5) * 50;
+                        positions[i3 + 2] = -500;
+                    }
+                }
+                
+                system.geometry.attributes.position.needsUpdate = true;
+            });
+        }
+        
+        // Even simpler animation for idle state
+        function animateStarsSimple() {
+            particles.forEach(particle => {
+                const { system, speed } = particle;
+                
+                // Just rotate the entire system instead of updating individual positions
+                system.rotation.z += speed * 0.01;
+                system.rotation.y += speed * 0.005;
+            });
+        }
+        
+        // Pause rendering when tab is not visible to save resources
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'hidden') {
+                // Nothing needed - our animation loop already checks for visibility
+            } else {
+                // Resume animation with fresh timer to avoid large jumps
+                timer.lastTime = performance.now();
+                needsRender = true;
+                lastInteraction = Date.now();
+            }
+        });
+
+        // The rest of your existing functions
+        function createConstellation() {
+            const constellation = document.getElementById('constellation');
+            if (!constellation) return;
+            
+            // Clear any existing elements
+            constellation.innerHTML = '';
+            
+            // Create stars
+            const starCount = 12; // Reduced number of stars
+            const stars = [];
+            
+            for (let i = 0; i < starCount; i++) {
+                const star = document.createElement('div');
+                star.className = 'star-point';
+                
+                // Random position within the container but avoid center area
+                let left, top;
+                
+                // Distribute stars more towards edges to avoid center text
+                if (Math.random() < 0.5) {
+                    left = Math.random() * 30 + 5; // Left side
+                } else {
+                    left = Math.random() * 30 + 65; // Right side
+                }
+                
+                // Top or bottom positioning
+                if (Math.random() < 0.5) {
+                    top = Math.random() * 30 + 5; // Top area
+                } else {
+                    top = Math.random() * 30 + 65; // Bottom area
+                }
+                
+                star.style.left = `${left}%`;
+                star.style.top = `${top}%`;
+                star.style.animationDelay = `${Math.random() * 2}s`;
+                
+                constellation.appendChild(star);
+                stars.push({ left, top, element: star });
+            }
+            
+            // Create fewer lines between stars
+            for (let i = 0; i < stars.length - 1; i += 2) { // Skip every other star for fewer lines
+                if (Math.random() < 0.5) { // 50% chance to create a line
+                    const star1 = stars[i];
+                    const star2 = stars[i + 1];
+                    
+                    const line = document.createElement('div');
+                    line.className = 'constellation-line';
+                    
+                    // Position and rotate the line
+                    const dx = star2.left - star1.left;
+                    const dy = star2.top - star1.top;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+                    const angle = Math.atan2(dy, dx);
+                    
+                    line.style.width = `${distance}%`;
+                    line.style.left = `${star1.left}%`;
+                    line.style.top = `${star1.top}%`;
+                    line.style.transform = `rotate(${angle}rad)`;
+                    
+                    constellation.appendChild(line);
+                }
+            }
+        }
+        
+        function updateNavigation() {
+            document.querySelectorAll('.nav-dot').forEach((dot, index) => {
+                dot.classList.toggle('active', index === targetSection);
+            });
+        }
+        
+        function updateSectionVisibility() {
+            if (window._lastActiveSection === targetSection) return;
+            
+            document.querySelectorAll('.section').forEach((section, index) => {
+                if (index === targetSection) {
+                    section.classList.add('active');
+                } else {
+                    section.classList.remove('active');
+                }
+            });
+            
+            window._lastActiveSection = targetSection;
+        }
+        
+        function scrollToSection(index) {
+            window.scrollTo({
+                top: index * window.innerHeight,
+                behavior: 'smooth'
+            });
+        }
+        
+        function moveCamera() {
+            currentSection += (targetSection - currentSection) * 0.05;
+            
+            const index = Math.floor(currentSection);
+            const nextIndex = Math.min(3, index + 1);
+            const fraction = currentSection - index;
+            
+            const currentCoord = sectionCoordinates[index];
+            const nextCoord = sectionCoordinates[nextIndex];
+            
+            const targetX = currentCoord.x + (nextCoord.x - currentCoord.x) * fraction;
+            const targetY = currentCoord.y + (nextCoord.y - currentCoord.y) * fraction;
+            const targetZ = currentCoord.z + (nextCoord.z - currentCoord.z) * fraction;
+            
+            camera.position.x += (targetX - camera.position.x) * 0.05;
+            camera.position.y += (targetY - camera.position.y) * 0.05;
+            camera.position.z += (targetZ - camera.position.z) * 0.05;
+            
+            camera.lookAt(targetX, targetY, targetZ - 100);
+            
+            rotateCamera();
+        }
+        
+        let mouseX = 0;
+        let mouseY = 0;
+        document.addEventListener('mousemove', (event) => {
+            mouseX = (event.clientX / window.innerWidth) * 2 - 1;
+            mouseY = (event.clientY / window.innerHeight) * 2 - 1;
+        });
+        
+        function rotateCamera() {
+            camera.position.x += (mouseX * 3 - camera.position.x) * 0.005;
+            camera.position.y += (-mouseY * 3 - camera.position.y) * 0.005;
+            
+            camera.lookAt(camera.position.x, camera.position.y, camera.position.z - 100);
+        }
+        
+        let resizeTimeout;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(() => {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+                
+                applyDeviceSpecificScaling();
+            }, 250);
+        });
+        
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'hidden') {
+            } else {
+                timer.lastTime = performance.now();
+            }
+        });
+
+        function applyDeviceSpecificScaling() {
+            const isMobile = window.innerWidth < 768;
+            
+            if (isMobile) {
+                document.documentElement.style.setProperty('--section-scale', '0.75');
+            } else {
+                const scale = Math.min(0.9, Math.max(0.8, window.innerWidth / 1440));
+                document.documentElement.style.setProperty('--section-scale', scale.toString());
+            }
+        }
+
+        function ensureTextVisibility() {
+            document.querySelectorAll('.mystery-text').forEach(el => {
+                el.style.maxHeight = 'none';
+                el.style.height = 'auto';
+            });
+            
+            document.querySelectorAll('.grid-item').forEach(item => {
+                item.style.minHeight = 'auto';
+            });
+        }
+        
+        window.addEventListener('load', init);
+    </script>
+</body>
+</html>
