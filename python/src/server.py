@@ -29,6 +29,16 @@ app_logger.addHandler(log_handler)  # Add general log handler
 app_logger.addHandler(error_log_handler)  # Add error log handler
 app_logger.setLevel(logging.INFO)  # Log at INFO level and above
 
+abbreviations = {
+'TI_on': 'TI',
+'SC_on': 'SC',
+'constants_on': 'CO',
+'coulomb_on': 'CL',
+'e_on': 'E',
+'i_on': 'I',
+'g_on': 'G'
+}
+
 # Serve all files in the 'templates' directory
 @app.route('/')
 def index():
@@ -62,17 +72,21 @@ def translate_expression():
                 'g_on': data.get('g_on', False)
             }
 
+            # Create a string of active settings using the first letter of each setting name
+
+            active_settings = "".join([abbr for setting, abbr in abbreviations.items() if settings.get(setting, False)])
+
             result = translate(expression, **settings)
             time_taken = (time() - start_time) * 1000
 
-            # Log the successful translation
-            app_logger.info(f"{real_ip} | {request.json.get('expression', '')} | {result} | {time_taken:.2f} ms | None".replace("\n", " "))
+            # Log the successful translation along with the active settings
+            app_logger.info(f"{real_ip} | {expression} | {result} | {time_taken:.2f} ms | Active Settings: {active_settings}")
             return jsonify({'result': result})
 
         except Exception as e:
             time_taken = (time() - start_time) * 1000
             # Log the error in both app.log and error.log
-            app_logger.error(f"{real_ip} | {expression} | Error: {str(e)} | {time_taken:.2f} ms".replace("\n", " "))
+            app_logger.error(f"{real_ip} | {expression} | Error: {str(e)} | {time_taken:.2f} ms")
             return jsonify({'error': 'An error occurred during translation.'}), 500
 
     elif request.method == 'GET':
