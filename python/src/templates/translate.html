@@ -1,140 +1,284 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta name="google-site-verification" content="v9lbmhfrTVRCxlmAPth89gJlAJY_hmZL2k_-KD8ir64" />
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Otso Veisterä - Translate</title>
+    <title>Otso Veisterä | LaTeX to Calc</title>
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
+            height: 100vh;
+            width: 100%;
+            background-color: #000;
             font-family: 'Arial', sans-serif;
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
-            margin: 0;
-            background-color: #0d1117; /* Dark background color */
-            color: #b7bfc7; /* Light gray text color */
-        }
-        .container {
-            text-align: center;
-            padding: 40px;
-            background: #21262d; /* Darker container background */
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-            border-radius: 10px;
-            max-width: 600px;
-            width: 100%;
-        }
-        h1 {
-            margin-bottom: 20px;
-            color: #e6edf3; /* Light text color for heading */
-            font-size: 2.5em;
-        }
-        input {
-            padding: 10px;
-            width: 80%;
-            margin-top: 20px;
-            border: none;
-            border-radius: 5px;
+            color: #f4f4f4;
             font-size: 16px;
-            background-color: #2b303b; /* Darker background color for input */
-            color: #e6edf3; /* Light text color for input */
-            outline: 2px solid #000000; /* Customize the focus ring color */
+            overflow: hidden;
         }
-        
-        input:focus {
-            outline: 2px solid #172231; /* Darker focus ring color */
-            outline-offset: 2px; /* Space between the element and the outline */
+
+        .background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 100%;
+            z-index: -1;
+            background: linear-gradient(135deg, #1d1d3c, #000);
         }
-        
+
+
+
+        .content {
+            text-align: center;
+            color: #e6e6e6;
+            max-width: 900px;
+            width: 90%;
+        }
+
+        h1 {
+            font-size: 3.5rem;
+            color: #a0a0ff;
+            margin-bottom: 20px;
+            font-weight: 400;
+            text-transform: uppercase;
+            letter-spacing: 5px;
+        }
+
+        p {
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+            color: #d1d1d1;
+            line-height: 1.5;
+            letter-spacing: 0.5px;
+        }
+
+        .input-wrapper {
+            width: 80%;
+            max-width: 700px;
+            margin: 20px auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .input-wrapper input,
+        .output {
+            width: 100%;
+            padding: 18px;
+            font-size: 1.2rem;
+            background-color: #1d1d1d;
+            color: #e6e6e6;
+            border-radius: 12px;
+            border: 1px solid #444;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .input-wrapper input:focus {
+            background-color: #333;
+            border-color: #ffffff;
+        }
+
+        .translate-button {
+            margin-top: 20px;
+            padding: 15px 30px;
+            font-size: 1.3rem;
+            color: #fffffff1;
+            background-color: #2a2a3c;
+            border-radius: 12px;
+            border: none;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            transition: transform 0.3s ease, background-color 0.3s ease;
+        }
+
+        .translate-button:hover {
+            transform: scale(1.1);
+            background-color: #444;
+        }
+
+        .output {
+            margin: 40px auto 30px;
+            padding: 25px;
+            font-size: 1rem;
+            color: #a0a0ff;
+            min-height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow-y: auto;
+        }
+
+        .note {
+            font-size: 0.9rem;
+            color: #aaa;
+            margin-top: 20px;
+        }
+
+        .note a {
+            color: #a0a0ff;
+            text-decoration: none;
+        }
+
+        .note a:hover {
+            text-decoration: underline;
+        }
+
+        /* Popup styling */
         .popup {
             position: fixed;
             bottom: 20px;
             left: 50%;
             transform: translateX(-50%);
-            background-color: #28a745; /* Green background */
-            color: white; /* White text */
+            background: #1d1d3c;
+            color: #a0a0ff;
             padding: 10px 20px;
-            border-radius: 5px;
-            opacity: 0; /* Start hidden */
-            transition: opacity 0.5s ease;
-            pointer-events: none; /* Prevent interaction */
+            border-radius: 8px;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
         }
+        .home-button {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            font-size: 1.2rem;
+            color: #a0a0ff;
+            text-decoration: none;
+            padding: 10px 15px;
+            background: rgba(29, 29, 60, 0.8);
+            border-radius: 8px;
+            transition: background 0.3s ease, color 0.3s ease, transform 0.3s ease;
+        }
+        
+        .home-button:hover {
+            background: rgba(68, 68, 136, 0.9);
+            color: #ffffffe7;
+            transform: scale(1.05);
+
+
+        }
+        
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Translate</h1>
-        <p>Enter text to translate or use the clipboard.</p>
-        <input type="text" id="translateInput" placeholder="Type your expression here..." />
-        <div id="result"></div>
+
+    <div class="background"></div>
+
+    <div class="content">
+        <a href="/" class="home-button">← Home</a>
+        <h1>LaTeX to Calc</h1>
+        <p>Convert LaTeX math expressions into calculator-friendly formats.</p>
+
+        <div class="input-wrapper">
+            <input type="text" id="latexInput" placeholder="Enter LaTeX expression..." />
+            <button class="translate-button" id="translateButton">Translate</button>
+        </div>
+
+        <div id="result" class="output"></div>
+
+        <p class="note">
+            Example: <code>\frac{1}{3}</code> translates to <code>((1)/(3))</code><br>
+            This app is an alternative ui to the <a href="https://github.com/OtsoBear/LatexToCalc" target="_blank">LatexToCalc Chrome extension</a>.
+        </p>
+
+        <div id="popup" class="popup">Copied to clipboard!</div>
     </div>
-    <div id="popup" class="popup">Copied to clipboard!</div>
 
     <script>
-        const clipboardAvailable = navigator.clipboard && window.isSecureContext; // Check for Clipboard API availability
-
-        document.getElementById('translateInput').addEventListener('input', function() {
+        document.getElementById('latexInput').addEventListener('input', function() {
             const text = this.value;
             if (text.includes('\\')) {
-                translate(text); // Call the translate function here
+                translate(text);
             }
         });
 
         async function translate(text) {
             const response = await fetch('/translate', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ expression: text })
             });
+
             const result = await response.json();
             document.getElementById('result').innerText = result.error ? result.error : result.result;
 
-            // Automatically copy the result to the clipboard
             if (result.result) {
-                if (!clipboardAvailable) {
-                    alert('Clipboard access is not available in this browser or context.');
+                if (!navigator.clipboard) {
+                    alert('Clipboard access is not available.');
                     return;
                 }
                 try {
                     await navigator.clipboard.writeText(result.result);
                     console.log('Translated text copied to clipboard.');
-                    showPopup(); // Show the popup notification
+                    showPopup();
                 } catch (error) {
-                    console.error('Failed to copy text: ', error);
+                    console.error('Clipboard error: ', error);
                 }
             }
         }
 
         const showPopup = () => {
             const popup = document.getElementById('popup');
-            popup.style.opacity = 1; // Show popup
-            setTimeout(() => {
-                popup.style.opacity = 0; // Fade out after 1 second
-            }, 1000);
+            popup.style.opacity = 1;
+            setTimeout(() => { popup.style.opacity = 0; },3500);
         };
 
-        // Check clipboard on page load and when the window gains focus
         const checkClipboard = async () => {
-            if (!clipboardAvailable) {
-                console.warn('Clipboard access is not available in this browser or context.');
-                return;
-            }
+            if (!navigator.clipboard) return;
             try {
                 const text = await navigator.clipboard.readText();
                 if (text.includes('\\')) {
-                    document.getElementById('translateInput').value = text;
-                    translate(text); // Automatically translate the clipboard content
+                    document.getElementById('latexInput').value = text;
+                    translate(text);
                 }
             } catch (error) {
-                console.error('Failed to read clipboard contents: ', error);
+                console.error('Clipboard read error: ', error);
             }
         };
 
-        window.onload = checkClipboard; // Check clipboard on load
-        window.onfocus = checkClipboard; // Check clipboard when the window gains focus
+        window.onload = checkClipboard;
+        window.onfocus = checkClipboard;
+
+        let cachedRoot = null;
+
+        // Preload the root page when the site loads
+        async function preloadRoot() {
+            try {
+                const response = await fetch('/');
+                cachedRoot = await response.text();
+            } catch (error) {
+                console.error('Failed to preload root:', error);
+            }
+        }
+    
+        // Switch to preloaded root instantly
+        function goToHome(event) {
+            event.preventDefault();
+            if (cachedRoot) {
+                document.open();
+                document.write(cachedRoot);
+                document.close();
+            } else {
+                window.location.href = '/';
+            }
+        }
+    
+        // Attach event listener to home button
+        document.getElementById('homeButton').addEventListener('click', goToHome);
+    
+        // Start preloading when the page loads
+        preloadRoot();
     </script>
+
 </body>
 </html>

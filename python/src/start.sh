@@ -116,7 +116,7 @@ if [[ ! -x "$GUNICORN_PATH" ]]; then
 fi
 
 echo "Starting server on port $PORT with $WORKERS workers..."
-if ! "$GUNICORN_PATH" -w $WORKERS -b 0.0.0.0:$PORT "$(basename "$MAIN_PY_PATH" .py):app"; then
+if ! "$GUNICORN_PATH" --limit-request-line 16384 -w $WORKERS -b 0.0.0.0:$PORT "$(basename "$MAIN_PY_PATH" .py):app"; then
     echo "Failed to start the server."
     exit 1
 fi
