@@ -4,11 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Otso Veisterä | Portfolio</title>
+    <!-- Preload the translation page for instant navigation -->
+    <link rel="preload" href="https://otso.veistera.com/translate" as="document">
     <script type="importmap">
         {
           "imports": {
-            "three": "https://cdn.jsdelivr.net/npm/three@0.174.0/build/three.module.js"}} 
+            "three": "https://cdn.jsdelivr.net/npm/three@0.174.0/build/three.module.js"
+          }
+        }
     </script>
+    <script src="https://unpkg.com/es-module-shims@1.5.0/dist/es-module-shims.js"></script>
     <style>
         body {
             margin: 0;
@@ -19,8 +24,8 @@
             overflow-x: hidden;
             height: 400vh;
             cursor: default;
-            font-size: 14px; /* Reduced base font size */
-            --section-scale: 0.85; /* Global scale factor */
+            font-size: 16px; /* Increased base font size from 14px */
+            --section-scale: 1.15; /* Increased scale factor from 0.85 */
         }
         
         canvas {
@@ -160,18 +165,18 @@
             background: rgba(10, 10, 25, 0.75);
             border: 1px solid rgba(160, 160, 255, 0.3);
             border-radius: 5px;
-            padding: 15px; /* Reduced from 20px */
+            padding: 20px; /* Increased from 15px */
             font-family: 'Space Mono', monospace;
             color: #a0a0ff;
             max-width: 100%;
             position: relative;
             overflow: hidden;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5), 0 0 30px rgba(160, 160, 255, 0.2);
-            transform: perspective(500px) rotateX(3deg); /* Less rotation */
+            transform: perspective(500px) rotateX(2deg); /* Reduced rotation angle */
             transition: all 0.3s ease;
             backdrop-filter: blur(6px);
             z-index: 2; /* Ensure terminal boxes appear above constellation */
-            font-size: 0.9rem; /* Slightly smaller font */
+            font-size: 1rem; /* Increased from 0.9rem */
             height: 100%;
         }
         
@@ -196,32 +201,42 @@
         }
         
         .terminal-content {
-            margin-top: 12px; /* Reduced from 15px */
-            line-height: 1.5; /* Reduced from 1.6 */
+            margin-top: 15px; /* Increased from 12px */
+            line-height: 1.6; /* Increased from 1.5 */
         }
         
         .terminal-tag {
             color: #7a7aea;
+            font-size: 0.95rem; /* Slightly smaller than content */
         }
         
         .terminal-command {
             color: #64ff64;
+            opacity: 0.7; /* Reduced prominence */
+            font-size: 0.95rem; /* Slightly smaller than content */
         }
         
         .terminal-string {
             color: #ff9e64;
+            font-size: 1rem;
         }
         
         .terminal-comment {
-            color: #626262;
+            color: #9e9e9e; /* Brightened from #626262 */
             font-style: italic;
         }
         
         .terminal-output {
-            color: #bababa;
-            margin-left: 20px;
+            color: #ffffff;
+            font-size: 1.05rem;
+            line-height: 1.7;
         }
         
+.terminal-output span {
+    padding-left: 10px; /* Apply padding only to individual spans */
+}
+
+
         .blink {
             animation: blink 1s step-end infinite;
             margin-left: 5px;
@@ -289,7 +304,7 @@
         }
         
         .mystery-text:before {
-            content: """;
+            content: '"';
             font-size: 3em; /* Reduced from 4em */
             position: absolute;
             top: -15px; /* Adjusted from -20px */
@@ -298,7 +313,7 @@
         }
         
         .mystery-text:after {
-            content: """;
+            content: '"';
             font-size: 3em; /* Reduced from 4em */
             position: absolute;
             bottom: -45px; /* Adjusted from -60px */
@@ -332,17 +347,20 @@
             text-decoration: none;
             color: #a0a0ff;
             display: inline-block;
-            padding: 5px 15px;
+            padding: 6px 18px; /* Increased padding */
             border: 1px solid rgba(160, 160, 255, 0.3);
             border-radius: 20px;
             margin-top: 15px;
             transition: all 0.3s ease;
-            font-size: 0.9rem;
+            font-size: 1rem; /* Increased from 0.9rem */
+            background-color: rgba(160, 160, 255, 0.1); /* Added background for better visibility */
         }
         
         .project-link:hover {
-            background: rgba(160, 160, 255, 0.1);
+            background: rgba(160, 160, 255, 0.2);
             border-color: rgba(160, 160, 255, 0.6);
+            transform: translateY(-2px);
+            box-shadow: 0 3px 10px rgba(160, 160, 255, 0.3);
         }
         
         /* Navigation dots */
@@ -472,7 +490,16 @@
             
             .mystery-text {
                 width: 95%;
-                padding: 12px;
+                padding: 15px; /* Increased from 12px */
+                font-size: 1rem; /* Ensure readable size on mobile */
+            }
+            
+            .terminal-box {
+                padding: 15px; /* Adjusted for mobile */
+            }
+            
+            .terminal-output {
+                margin-left: 10px; /* Reduced margin on mobile */
             }
         }
     </style>
@@ -494,7 +521,7 @@
         <h1>Otso Veisterä</h1>
         
         <div class="mystery-text text-reveal" style="--delay: 1">
-            <span class="highlight">Explorer of digital frontiers.</span> Creating solutions at the intersection of science and code. Fluent in Finnish and English (C2), mathematics and machine learning.
+            <span class="highlight">Explorer of digital frontiers.</span> Creating solutions at the intersection of science and code. Nationally recognized problem-solver with Finland's best physics report in competition. Fluent in Finnish and English (C2), mathematics and technology.
         </div>
         
         <div class="content-grid">
@@ -507,7 +534,7 @@
                         <span class="terminal-command">$ cat skills.txt</span><br>
                         <span class="terminal-output">
                             <span class="skill">Programming</span>
-                            <span class="skill">Machine Learning</span>
+                            <span class="skill">Electrical Engineering</span>
                             <span class="skill">Python</span>
                             <span class="skill">Problem Solving</span>
                             <span class="skill">Rust</span>
@@ -515,11 +542,10 @@
                         
                         <span class="terminal-command">$ echo $achievements</span><br>
                         <span class="terminal-output">
-                            - Coder of The Year<br>
-                            - Young Innovator<br>
-                            - Best Physics Report in Finland<br>
-                        </span><br>
-                        
+                            <span>  - Coder of The Year</span><br>
+                            <span>  - Young Innovator</span><br>
+                            <span style="color: #a0a0ff; font-weight: bold;">  - Best Physics Report in Finland — National Problem-Solving Champion</span><br>
+                        </span>
                         <span class="terminal-comment">// Constantly exploring new technologies</span><br>
                         <span class="terminal-command">$ find . -name "curiosity"</span><span class="blink">_</span>
                     </div>
@@ -531,25 +557,25 @@
                 <div class="terminal-box">
                     <div class="constellation" id="constellation"></div>
                     <div class="terminal-content">
-                        <span class="terminal-tag">&lt;approach&gt;</span><br>
+                        <span class="terminal-tag">&lt;enthusiasm&gt;</span><br>
                         <span class="terminal-output">
-                            I combine analytical thinking with creative problem-solving, seeking elegant and efficient solutions.
+                            Deeply driven by the excitement of learning and exploring a wide variety of projects.
                         </span><br>
-                        <span class="terminal-tag">&lt;/approach&gt;</span><br><br>
+                        <span class="terminal-tag">&lt;/enthusiasm&gt;</span><br><br>
                         
-                        <span class="terminal-tag">&lt;philosophy&gt;</span><br>
+                        <span class="terminal-tag">&lt;strengths&gt;</span><br>
                         <span class="terminal-output">
-                            Technology should solve real problems, not just exist for its own sake.
+                            Problem solving abilities and fast learning speed
                         </span><br>
-                        <span class="terminal-tag">&lt;/philosophy&gt;</span><br><br>
+                        <span class="terminal-tag">&lt;/strengths&gt;</span><br><br>
                         
-                        <span class="terminal-string">"Knowledge is assembling pieces of a puzzle you've never seen completed."</span>
+                        <span class="terminal-string">"Eager to harness the power of technology in every project undertaken."</span>
                     </div>
                 </div>
             </div>
         </div>
         
-        <a href="#" class="contact-button" onclick="scrollToSection(3); return false;">Discover More</a>
+        <a href="#" class="contact-button" onclick="scrollToSection(1); return false;">Discover More</a>
     </section>
     
     <section class="section" id="section1" data-depth="1">
@@ -596,12 +622,17 @@
                             &nbsp;&nbsp;"highlight": "33 bugs identified in one week",<br>
                             &nbsp;&nbsp;"location": "Planmeca internship",<br>
                             &nbsp;&nbsp;"skill": "Exceptional attention to detail"<br>
-                            }<br><br>
+                            }<br>
                             {<br>
                             &nbsp;&nbsp;"highlight": "Electronics & microcontroller development",<br>
                             &nbsp;&nbsp;"location": "Aalto Design Factory",<br>
-                            &nbsp;&nbsp;"skill": "Hardware-software integration"<br>
+                            &nbsp;&nbsp;"skill": "Electrical engineering"<br>
                             }<br>
+                            {<br>
+                            &nbsp;&nbsp;"highlight": "Finland's top physics report",<br>
+                            &nbsp;&nbsp;"location": "Harppi science competition",<br>
+                            &nbsp;&nbsp;"skill": "Elite problem-solving abilities"<br>
+                            }
                         </span><br>
                         
                         <span class="terminal-command">$ git log --author="Otso" --pretty=format:"%h - %s"</span><span class="blink">_</span>
@@ -622,9 +653,10 @@
             <div class="grid-item" style="--delay: 2">
                 <div class="terminal-box">
                     <div class="terminal-content">
-                        <span class="terminal-tag">[LatexToCalc]</span><br>
+                        <span class="terminal-tag">
+                            <a href="https://github.com/OtsoBear/LatexToCalc" target="_blank" rel="noopener"> [LatexToCalc]</a>
                         <span class="terminal-output">
-                            Translating mathematical language across platforms<br>
+                            Translates LaTeX code into formats usable by calculators in Finnish high schools<br>
                             <br>
                             <span class="terminal-comment">// Backend</span><br>
                             Flask-based translation server<br>
@@ -637,8 +669,10 @@
                         </span><br>
                         
                         <span class="terminal-string">
-                            "Making complex expressions accessible everywhere."
+                            "Making complicated math formulas work across different platforms."
                         </span><br>
+                        
+                        <a href="https://otso.veistera.com/translate" class="project-link">See Project</a>
                     </div>
                 </div>
             </div>
@@ -646,28 +680,34 @@
             <div class="grid-item" style="--delay: 3">
                 <div class="terminal-box">
                     <div class="terminal-content">
-                        <span class="terminal-tag">[Rustful Raytracer]</span><br>
-                        <span class="terminal-output">
-                            High-performance graphics engine built in Rust<br>
+                        <span class="terminal-tag">
+                            <a href="https://github.com/OtsoBear" target="_blank" rel="noopener"> [Rustful Raytracer]</a>
+                        </span><br>                        <span class="terminal-output">
+                            Path tracing engine built from scratch in Rust<br>
                             <br>
                             <span class="terminal-comment">// Features</span><br>
-                            Multi-threaded rendering<br>
+                            Path-traced rendering<br>
                             Realistic material simulation<br>
                             Reflection & refraction physics<br>
-                            Mathematical optics modeling<br>
+                            Physical optics modeling<br>
                         </span><br>
                         
-                        <span class="terminal-command">$ ./measure_performance.sh</span><br>
+                        <span class="terminal-tag">
+                            <a href="https://www.stuhi.org" target="_blank" rel="noopener">[STUHI.org]</a>
+                        </span><br>
                         <span class="terminal-output">
-                            Render time: [██████████] 100%<br>
-                            Quality: Photorealistic<br>
-                            Status: Optimized
-                        </span><br>
-                        
-                        <a href="#" class="project-link">View Projects</a>
+                            Website developed for free for a non-profit aiming to improve Finland's startup culture<br>
+                            <br>
+                            <span class="terminal-comment">// Features</span><br>
+                            Built with bare HTML, CSS, and JavaScript<br>
+                            Simple, clean, and effective design<br>
+                            Demonstrates my passion and initiative, built entirely by me at no cost
+                        </span>
                     </div>
                 </div>
             </div>
+            
+
         </div>
     </section>
     
@@ -697,7 +737,7 @@
                         
                         <span class="terminal-command">$ echo $future_interests</span><br>
                         <span class="terminal-output">
-                            AI Research, Computer Vision, Physics Simulation
+                            Circuitry, Computer Vision, Physics Simulation, AI Research
                         </span>
                     </div>
                 </div>
@@ -755,12 +795,12 @@
         let currentSection = 0;
         let targetSection = 0;
         
-        // Section positions in 3D space - distribute more evenly and reduce distances
+        // Section positions in 3D space - more dramatic differences for better visual distinction
         const sectionCoordinates = [
             { x: 0, y: 0, z: 0 },
-            { x: 100, y: 20, z: -100 },
-            { x: -80, y: -30, z: -200 },
-            { x: 0, y: 0, z: -300 }
+            { x: 120, y: 30, z: -80 },
+            { x: -100, y: -40, z: -160 },
+            { x: 0, y: 0, z: -240 }
         ];
         
         // Initialize with performance options
@@ -793,8 +833,8 @@
             scene = new THREE.Scene();
             
             // Create camera with adjusted parameters for better zoom level
-            camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 2000);
-            camera.position.set(0, 0, 50);
+            camera = new THREE.PerspectiveCamera(65, window.innerWidth / window.innerHeight, 0.1, 2000);
+            camera.position.set(0, 0, 40); // Moved camera closer (from 50 to 40)
             
             // Create particles - OPTIMIZED VERSION
             createOptimizedStars(isLowEndDevice);
@@ -813,6 +853,36 @@
             
             // Check if desktop or mobile and apply appropriate scaling
             applyDeviceSpecificScaling();
+            
+            // Fix scrolling behavior
+            fixScrollSections();
+        }
+        
+        // Add this function to fix section scrolling
+        function fixScrollSections() {
+            // Set up the page for full-section scrolling
+            document.body.style.scrollSnapType = 'y mandatory';
+            
+            // Make each section take exactly one viewport height
+            document.querySelectorAll('.section').forEach(section => {
+                section.style.height = '100vh';
+                section.style.scrollSnapAlign = 'start';
+            });
+            
+            // Fix the scrollToSection function to properly handle section navigation
+            window.scrollToSection = function(index) {
+                targetSection = index;
+                window.scrollTo({
+                    top: index * window.innerHeight,
+                    behavior: 'smooth'
+                });
+                
+                // Update section visibility immediately
+                updateSectionVisibility();
+                
+                // Update navigation dots
+                updateNavigation();
+            };
         }
         
         // Optimized star creation function
@@ -823,10 +893,10 @@
             // Create a sprite-based material which is more efficient
             const starTexture = createStarTexture();
             const material = new THREE.PointsMaterial({
-                size: isLowEndDevice ? 1.2 : 0.8, // Larger but fewer stars on low-end devices
+                size: isLowEndDevice ? 1.2 : 1.0, // Slightly larger stars for better visibility
                 map: starTexture,
                 transparent: true,
-                opacity: 0.7,
+                opacity: 0.8, // Increased from 0.7
                 depthWrite: false,
                 blending: THREE.AdditiveBlending,
                 sizeAttenuation: true
@@ -840,7 +910,7 @@
             const bounds = {
                 x: [-250, 250],
                 y: [-150, 150],
-                z: [-500, 50]
+                z: [-400, 100] // Extended range for better depth
             };
             
             // Distribute stars randomly within bounds
