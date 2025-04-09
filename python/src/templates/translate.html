@@ -34,8 +34,6 @@
             background: linear-gradient(135deg, #1d1d3c, #000);
         }
 
-
-
         .content {
             text-align: center;
             color: #e6e6e6;
@@ -74,18 +72,20 @@
             width: 100%;
             padding: 18px;
             font-size: 1.2rem;
-            background-color: #1d1d1d;
+            background-color: #242433;
             color: #e6e6e6;
             border-radius: 12px;
-            border: 1px solid #444;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+            border: 1px solid #3a3a5a;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
             transition: all 0.3s ease;
             text-align: center;
         }
 
         .input-wrapper input:focus {
-            background-color: #333;
-            border-color: #ffffff;
+            background-color: #2a2a40;
+            border-color: #5050aa;
+            outline: none;
+            box-shadow: 0 4px 12px rgba(80, 80, 170, 0.3);
         }
 
         .translate-button {
@@ -111,12 +111,19 @@
             margin: 40px auto 30px;
             padding: 25px;
             font-size: 1rem;
-            color: #a0a0ff;
+            color: #b8b8ff;
             min-height: 70px;
             display: flex;
             align-items: center;
             justify-content: center;
             overflow-y: auto;
+            background-color: #242433;
+            opacity: 0; /* Start invisible */
+            transition: opacity 0.3s ease;
+        }
+
+        .output.has-content {
+            opacity: 1;
         }
 
         .note {
@@ -164,18 +171,223 @@
             background: rgba(68, 68, 136, 0.9);
             color: #ffffffe7;
             transform: scale(1.05);
+        }
 
-
+        /* Options panel styling */
+        .options-panel {
+            position: fixed;
+            top: 50%;
+            right: 0;
+            transform: translateY(-50%) translateX(250px);
+            background: rgba(29, 29, 60, 0.85);
+            border-radius: 12px 0 0 12px;
+            padding: 20px 20px 15px 45px; /* Reduced bottom padding */
+            width: 280px;
+            box-shadow: -4px 0 15px rgba(0, 0, 0, 0.4);
+            transition: transform 0.4s ease, 
+                        box-shadow 0.3s ease,
+                        background 0.3s ease;
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            border-left: 1px solid rgba(255, 255, 255, 0.1);
+            max-height: 90vh; /* Ensure it doesn't exceed viewport height */
+            overflow-y: auto; /* Allow scrolling if needed */
         }
         
+        .options-panel:hover {
+            transform: translateY(-50%) translateX(0);
+            box-shadow: -6px 0 20px rgba(0, 0, 0, 0.6);
+            background: rgba(29, 29, 60, 0.95);
+        }
+        
+        .options-panel h3 {
+            color: #a0a0ff;
+            margin-bottom: 12px; /* Slightly reduced bottom margin */
+            font-weight: 400;
+            letter-spacing: 2px;
+            text-align: center;
+            padding-bottom: 5px;
+            position: relative;
+        }
+        
+        .options-panel h3::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60%;
+            height: 1px;
+            background: #5050aa;
+            transition: width 0.3s ease;
+        }
+        
+        .options-panel:hover h3::after {
+            width: 70%;
+        }
+        
+        .options-panel label {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 8px 0; /* Slightly reduced vertical margins */
+            color: #d1d1d1;
+            font-size: 1rem;
+            padding: 3px 8px;
+            border-radius: 6px;
+            transition: background-color 0.2s, opacity 0.3s, transform 0.2s;
+            opacity: 0;
+            transform: translateX(10px);
+        }
+        
+        .options-panel:hover label {
+            opacity: 1;
+            transform: translateX(0);
+            transition-delay: 0.05s; /* Set a uniform small delay for all labels */
+        }
+        
+        .tab-indicator {
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            writing-mode: vertical-rl;
+            text-orientation: mixed;
+            color: #a0a0ff;
+            font-weight: bold;
+            letter-spacing: 3px;
+            text-shadow: 0 0 10px rgba(160, 160, 255, 0.3);
+        }
+        
+        .separator {
+            height: 1px;
+            background: #4a545e;
+            margin: 12px 0; /* Reduced vertical margins */
+            width: 100%;
+            opacity: 0.5;
+        }
+        
+        /* Toggle switch styling */
+        .options-panel input[type="checkbox"] {
+            --s: 10px;
+            height: var(--s);
+            aspect-ratio: 2.5;
+            width: auto; 
+            border-radius: var(--s);
+            padding: calc(var(--s)/10);
+            margin: calc(var(--s)/2);
+            cursor: pointer;
+            background:
+              radial-gradient(farthest-side, #15202a 96%, #0000) 
+                var(--_p, 0%)/var(--s) content-box no-repeat,
+              var(--_c, #ff7a7a);
+            box-sizing: content-box;
+            transform-origin: calc(3*var(--s)/5) 50%;
+            transition: transform cubic-bezier(0,300,1,300) .5s, background .3s .1s ease-in;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            outline: none;
+            border: none;
+            opacity: 1;
+        }
+        
+        .options-panel input[type="checkbox"]:checked {
+            --_c: #85ff7a;
+            --_p: 100%;
+            transform-origin: calc(100% - 3*var(--s)/5) 50%;
+            transform: rotate(0.1deg);
+        }
+        
+        /* Label with separator after it */
+        .options-panel label.separator-after {
+            position: relative;
+            margin-bottom: 15px;
+        }
+        
+        .options-panel label.separator-after::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 0;
+            width: 100%;
+            height: 1px;
+            background: #4a545e;
+            opacity: 0.5;
+        }
+        
+        /* Ensure toggle switches are always visible even if labels are hidden */
+        .toggle-container {
+            opacity: 1;
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+        }
+
+        .calculator-choice .setting-label {
+            font-weight: 500;
+        }
     </style>
 </head>
 <body>
 
     <div class="background"></div>
 
+    <!-- Options panel -->
+    <div class="options-panel">
+        <div class="tab-indicator">OPTIONS</div>
+        <h3>Calculator Settings</h3>
+        <label class="calculator-choice" id="TI_label">
+            <span class="setting-label">TI-Nspire</span>
+            <div class="toggle-container">
+                <input type="checkbox" id="TI_on" checked>
+            </div>
+        </label>
+        <label class="calculator-choice separator-after" id="SC_label">
+            <span class="setting-label">Speedcrunch</span>
+            <div class="toggle-container">
+                <input type="checkbox" id="SC_on">
+            </div>
+        </label>
+        
+        <h3>Constants</h3>
+        <label>
+            <span class="setting-label">Enable Constants</span>
+            <div class="toggle-container">
+                <input type="checkbox" id="constants_on">
+            </div>
+        </label>
+        <label>
+            <span class="setting-label">k = Coulomb's constant</span>
+            <div class="toggle-container">
+                <input type="checkbox" id="coulomb_on">
+            </div>
+        </label>
+        <label>
+            <span class="setting-label">e = Euler's number</span>
+            <div class="toggle-container">
+                <input type="checkbox" id="e_on">
+            </div>
+        </label>
+        <label>
+            <span class="setting-label">i = Imaginary unit</span>
+            <div class="toggle-container">
+                <input type="checkbox" id="i_on">
+            </div>
+        </label>
+        <label>
+            <span class="setting-label">g = Gravity</span>
+            <div class="toggle-container">
+                <input type="checkbox" id="g_on">
+            </div>
+        </label>
+    </div>
+
     <div class="content">
-        <a href="/" class="home-button">← Home</a>
+        <a href="/" class="home-button" id="homeButton">← Home</a>
         <h1>LaTeX to Calc</h1>
         <p>Convert LaTeX math expressions into calculator-friendly formats.</p>
 
@@ -203,15 +415,40 @@
             }
         });
 
+        document.getElementById('translateButton').addEventListener('click', function() {
+            const text = document.getElementById('latexInput').value;
+            translate(text);
+        });
+
         async function translate(text) {
+            // Get settings from checkboxes
+            const settings = {
+                expression: text,
+                TI_on: document.getElementById('TI_on').checked,
+                SC_on: document.getElementById('SC_on').checked,
+                constants_on: document.getElementById('constants_on').checked,
+                coulomb_on: document.getElementById('coulomb_on').checked,
+                e_on: document.getElementById('e_on').checked,
+                i_on: document.getElementById('i_on').checked,
+                g_on: document.getElementById('g_on').checked
+            };
+
             const response = await fetch('/translate', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ expression: text })
+                body: JSON.stringify(settings)
             });
 
             const result = await response.json();
-            document.getElementById('result').innerText = result.error ? result.error : result.result;
+            const outputElement = document.getElementById('result');
+            outputElement.innerText = result.error ? result.error : result.result;
+            
+            // Add class to make output visible when it has content
+            if (result.error || result.result) {
+                outputElement.classList.add('has-content');
+            } else {
+                outputElement.classList.remove('has-content');
+            }
 
             if (result.result) {
                 if (!navigator.clipboard) {
@@ -275,10 +512,147 @@
         }
     
         // Attach event listener to home button
-        document.getElementById('homeButton').addEventListener('click', goToHome);
+        document.querySelector('.home-button').addEventListener('click', goToHome);
     
         // Start preloading when the page loads
         preloadRoot();
+
+        // Save settings to local storage when changed
+        const saveSettings = () => {
+            const settings = {
+                TI_on: document.getElementById('TI_on').checked,
+                SC_on: document.getElementById('SC_on').checked,
+                constants_on: document.getElementById('constants_on').checked,
+                coulomb_on: document.getElementById('coulomb_on').checked,
+                e_on: document.getElementById('e_on').checked,
+                i_on: document.getElementById('i_on').checked,
+                g_on: document.getElementById('g_on').checked
+            };
+            localStorage.setItem('latexToCalcSettings', JSON.stringify(settings));
+        };
+
+        // Load settings from local storage
+        const loadSettings = () => {
+            const savedSettings = localStorage.getItem('latexToCalcSettings');
+            if (savedSettings) {
+                const settings = JSON.parse(savedSettings);
+                document.getElementById('TI_on').checked = settings.TI_on;
+                document.getElementById('SC_on').checked = settings.SC_on;
+                document.getElementById('constants_on').checked = settings.constants_on;
+                document.getElementById('coulomb_on').checked = settings.coulomb_on;
+                document.getElementById('e_on').checked = settings.e_on;
+                document.getElementById('i_on').checked = settings.i_on;
+                document.getElementById('g_on').checked = settings.g_on;
+                
+                // Ensure mutual exclusivity
+                ensureOneCalculatorSelected();
+                updateCalculatorStyles();
+            } else {
+                // Default to TI-Nspire if no settings found
+                document.getElementById('TI_on').checked = true;
+                document.getElementById('SC_on').checked = false;
+                updateCalculatorStyles();
+            }
+        };
+
+        // Add change event listeners to all checkboxes
+        const checkboxes = document.querySelectorAll('.options-panel input[type="checkbox"]');
+        checkboxes.forEach(checkbox => {
+            if (checkbox.id !== 'TI_on' && checkbox.id !== 'SC_on') {
+                checkbox.addEventListener('change', saveSettings);
+            }
+        });
+
+        // Load settings when the page loads
+        window.addEventListener('load', function() {
+            loadSettings();
+            
+            // Make sure output is hidden on initial load
+            const outputElement = document.getElementById('result');
+            if (!outputElement.innerText.trim()) {
+                outputElement.classList.remove('has-content');
+            } else {
+                outputElement.classList.add('has-content');
+            }
+        });
+
+        // Make TI-Nspire and Speedcrunch mutually exclusive
+        document.getElementById('TI_on').addEventListener('change', function() {
+            if (this.checked) {
+                document.getElementById('SC_on').checked = false;
+                document.getElementById('TI_label').classList.add('active');
+                document.getElementById('SC_label').classList.remove('active');
+            } else {
+                document.getElementById('SC_on').checked = true;
+                document.getElementById('TI_label').classList.remove('active');
+                document.getElementById('SC_label').classList.add('active');
+            }
+            saveSettings();
+        });
+
+        document.getElementById('SC_on').addEventListener('change', function() {
+            if (this.checked) {
+                document.getElementById('TI_on').checked = false;
+                document.getElementById('SC_label').classList.add('active');
+                document.getElementById('TI_label').classList.remove('active');
+            } else {
+                document.getElementById('TI_on').checked = true;
+                document.getElementById('SC_label').classList.remove('active');
+                document.getElementById('TI_label').classList.add('active');
+            }
+            saveSettings();
+        });
+
+        // Initialize calculator choice styles
+        function updateCalculatorStyles() {
+            // Removed the color highlighting, just keep track of which one is active
+            if (document.getElementById('TI_on').checked) {
+                document.getElementById('TI_label').classList.add('active');
+                document.getElementById('SC_label').classList.remove('active');
+            } else {
+                document.getElementById('SC_label').classList.add('active');
+                document.getElementById('TI_label').classList.remove('active');
+            }
+        }
+
+        // Ensure one calculator type is always selected
+        function ensureOneCalculatorSelected() {
+            if (!document.getElementById('TI_on').checked && !document.getElementById('SC_on').checked) {
+                document.getElementById('TI_on').checked = true;
+                updateCalculatorStyles();
+            }
+        }
+
+        // Add window resize event listener to adjust panel position when zooming
+        function adjustPanelPosition() {
+            const panel = document.querySelector('.options-panel');
+            const panelRect = panel.getBoundingClientRect();
+            const windowHeight = window.innerHeight;
+            
+            // Calculate how much of the panel would extend beyond the bottom of the screen
+            const bottomOverflow = panelRect.bottom - windowHeight;
+            
+            // If panel would extend below the viewport
+            if (bottomOverflow > 0) {
+                // Move panel up just enough to not be cut off at bottom
+                const newTopPercent = Math.max(10, 50 - (bottomOverflow / windowHeight * 100 / 2));
+                panel.style.top = newTopPercent + '%';
+            } else {
+                // Reset to default center position if there's enough room
+                panel.style.top = '50%';
+            }
+        }
+        
+        window.addEventListener('resize', adjustPanelPosition);
+        window.addEventListener('load', adjustPanelPosition);
+        
+        // Detect zoom changes (works in most browsers)
+        window.addEventListener('wheel', function(e) {
+            if (e.ctrlKey) {
+                // Small delay to let the zoom complete
+                setTimeout(adjustPanelPosition, 100);
+            }
+        });
     </script>
 
 </body>
