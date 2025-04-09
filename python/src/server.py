@@ -74,7 +74,7 @@ def translate_expression():
 
             # Create a string of active settings using the first letter of each setting name
 
-            active_settings = "".join([abbr for setting, abbr in abbreviations.items() if settings.get(setting, False)])
+            active_settings = " ".join([abbr for setting, abbr in abbreviations.items() if settings.get(setting, False)])
 
             result = translate(expression, **settings)
             time_taken = (time() - start_time) * 1000
