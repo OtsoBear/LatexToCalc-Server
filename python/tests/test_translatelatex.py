@@ -7,6 +7,7 @@ test_cases = [
     (r"y=xy^1+\\frac{1}{1^1}", "y=x*y^1+((1)/(1^1))"),
   # (r"\sum_{i=1}^nx_i","∑(x,i,1,n)"), #translates to: ∑(x,i,1,n)*
   # (r"m_1m_2", "m₁*m₂"), #translates to m_1*m_2
+  #  (r"T_\alpha + T_D = Q'", "T+T=Q'")
     (r"\binom{n}{k}=\frac{n!}{k!(n-k)!}", "nCr(n,k)=((n!)/(k!(n-k)!))"), #maol version translates to: ([[nk]])=((n!)/(k!(n-k)!))
     (r"\sqrt[n]{a}", "root(a,n)"),
     (r"{{a}^{\frac{1}{n}}}", "((a)^(((1)/(n))))"),
