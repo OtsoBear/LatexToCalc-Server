@@ -1,7 +1,7 @@
 import re
 import regex
 
-class LaTeX2CalcEngine:
+class LatexToCalcEngine:
     """
     Contains:
     - dictionaries of LaTeX expressions and their translation
@@ -1525,8 +1525,13 @@ class LaTeX2CalcEngine:
         return expression
 
     def translateSubscripts(self, expression):
+        print(expression)
         # Define the regex pattern to capture content inside curly braces following an underscore
         pattern = r'_(?:[^{]*?)\{(.*?)\}'
+        # Pattern for _\text{LETTER} with tags
+        text_pattern = r'_\\text\£(\d+)\£\{([A-Za-z])\}\£\1\£'
+        # Pattern for unit-formatted subscripts (_⁃a』)
+        unit_pattern = r'_⁃([A-Za-z])』'
 
         # Define the subscript digits and the letter mappings
         subscript_digits = "₀₁₂₃₄₅₆₇₈₉"
@@ -1546,6 +1551,7 @@ class LaTeX2CalcEngine:
             "Y": "", "Z": ""
         }
         
+ 
         # Function to translate characters within the subscript
         def subscript_translator(content):
             translated = ''.join(
@@ -1554,7 +1560,22 @@ class LaTeX2CalcEngine:
             )
             return translated
 
-        # Find all matches for the pattern
+        # Handle unit-formatted subscripts (_⁃a』)
+        unit_matches = list(re.finditer(unit_pattern, expression))
+        for unit_match in unit_matches:
+            letter = unit_match.group(1)
+            translated_letter = subscript_translator(letter)
+            expression = expression.replace(f'_⁃{letter}』', translated_letter, 1)
+
+        # First, handle the _\text{LETTER} pattern with tags
+        text_matches = list(re.finditer(text_pattern, expression))
+        for text_match in text_matches:
+            tag = text_match.group(1)
+            letter = text_match.group(2)
+            translated_letter = subscript_translator(letter)
+            expression = expression.replace(f'_\\text£{tag}£{{{letter}}}£{tag}£', translated_letter, 1)
+
+        # Find all matches for the regular pattern
         matches = list(re.finditer(pattern, expression))
         
         for match in matches:
@@ -1576,9 +1597,9 @@ class LaTeX2CalcEngine:
                 underscore_pos -= 1
 
             expression = expression[:underscore_pos] + expression[underscore_pos + 1:]   
-            
-
+        print(expression)
         return expression
+    
     def removeIdentifiers(self, expression):
         patterns = [r'\£([0-9]+)\£', r'\$([0-9]+)\$', r'\`([0-9]+)\`', r'\§([0-9]+)\§']
         for pattern in patterns:
@@ -1589,7 +1610,7 @@ class LaTeX2CalcEngine:
 
 
 def translate(expression, TI_on=True, SC_on=False, constants_on=False, coulomb_on=False, e_on=False, i_on=False, g_on=False):
-    engine = LaTeX2CalcEngine(TI_on, SC_on)
+    engine = LatexToCalcEngine(TI_on, SC_on)
     
     expression = re.sub(r'\\operatorname\{([a-z]+)\}', r'\\\1', expression)
     expression = engine.translateSymbols(expression)
@@ -1797,5 +1818,6 @@ coulomb_on = False
 
 if __name__ == "__main__":
     print(translate(r"\\frac{translatelatex}{ran}"))
+    print(translate(r"K_\text{a}"))
 else:
     print("Translatelatex.py loaded")
