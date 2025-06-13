@@ -1300,6 +1300,7 @@ class LatexToCalcEngine:
             derivative = True
             
         if re.search(r"D", expression):
+            print(expression)
             expression = expression.replace("D", r"{{d}/{dx}}")
             derivative = True
             
@@ -1532,7 +1533,8 @@ class LatexToCalcEngine:
         text_pattern = r'_\\text\£(\d+)\£\{([A-Za-z])\}\£\1\£'
         # Pattern for unit-formatted subscripts (_⁃a』)
         unit_pattern = r'_⁃([A-Za-z])』'
-
+        # Pattern for direct numeric subscripts (_3)
+        digit_pattern = r'_(\d+)'
         # Define the subscript digits and the letter mappings
         subscript_digits = "₀₁₂₃₄₅₆₇₈₉"
         indexDict = {
@@ -1559,6 +1561,13 @@ class LatexToCalcEngine:
                 for char in content
             )
             return translated
+
+        # Handle direct numeric subscripts (_3)
+        digit_matches = list(re.finditer(digit_pattern, expression))
+        for digit_match in digit_matches:
+            digits = digit_match.group(1)
+            translated_digits = subscript_translator(digits)
+            expression = expression.replace(f'_{digits}', translated_digits, 1)
 
         # Handle unit-formatted subscripts (_⁃a』)
         unit_matches = list(re.finditer(unit_pattern, expression))
@@ -1783,6 +1792,11 @@ def translate(expression, TI_on=True, SC_on=False, constants_on=False, coulomb_o
 
     if SC_on: expression = expression.replace("π", "(pi)")
 
+    # Pattern to match: any term ending with subscript followed by a term starting with letter/number
+    subscript_chars = "₀₁₂₃₄₅₆₇₈₉"
+    subscript_pattern = r'([a-zA-Z0-9]+[' + subscript_chars + r'])([a-zA-Z0-9]+)'
+    expression = re.sub(subscript_pattern, r'\1*\2', expression)
+    
     # yleisiä suureyhtälökohtia
     addAsterisk = {
         "mv": "m*v",
@@ -1800,6 +1814,8 @@ def translate(expression, TI_on=True, SC_on=False, constants_on=False, coulomb_o
     }
     for org, new in addAsterisk.items():
         expression = expression.replace(org, new)
+        
+    
     
     return expression
 

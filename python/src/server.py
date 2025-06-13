@@ -4,6 +4,7 @@ from translatelatex import translate
 import logging
 from time import time
 from os import path, makedirs
+import signal
 
 app = Flask(__name__)
 CORS(app)
@@ -39,6 +40,13 @@ abbreviations = {
 'g_on': 'G'
 }
 
+# Simple timeout handler
+class TimeoutError(Exception):
+    pass
+
+def timeout_handler(_signum, _frame):  # Underscore prefix indicates intentionally unused parameters
+    raise TimeoutError("Translation timeout")
+
 # Serve all files in the 'templates' directory
 @app.route('/')
 def index():
@@ -62,6 +70,11 @@ def translate_expression():
 
             data = request.json
             expression = data.get('expression', '')
+            
+            # Block overly long requests
+            if len(expression) > 10000:
+                return jsonify({'error': 'Expression too long. Please use shorter expressions.'}), 400
+            
             settings = {
                 'TI_on': data.get('TI_on', True),
                 'SC_on': data.get('SC_on', False),
@@ -73,16 +86,27 @@ def translate_expression():
             }
 
             # Create a string of active settings using the first letter of each setting name
-
             active_settings = " ".join([abbr for setting, abbr in abbreviations.items() if settings.get(setting, False)])
 
-            result = translate(expression, **settings)
+            # Set timeout
+            signal.signal(signal.SIGALRM, timeout_handler)
+            signal.alarm(30)  # 30 second timeout
+            
+            try:
+                result = translate(expression, **settings)
+            finally:
+                signal.alarm(0)  # Cancel timeout
+            
             time_taken = (time() - start_time) * 1000
 
             # Log the successful translation along with the active settings
             app_logger.info(f"{real_ip} | {expression} | {result} | {time_taken:.2f} ms | Active Settings: {active_settings}")
             return jsonify({'result': result})
 
+        except TimeoutError:
+            time_taken = (time() - start_time) * 1000
+            app_logger.error(f"{real_ip} | {expression} | TIMEOUT | {time_taken:.2f} ms")
+            return jsonify({'error': 'Translation timeout. Please try a simpler expression.'}), 408
         except Exception as e:
             time_taken = (time() - start_time) * 1000
             # Log the error in both app.log and error.log
