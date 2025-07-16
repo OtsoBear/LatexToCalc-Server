@@ -69,10 +69,13 @@ def translate_expression():
                 real_ip = forwarded_for.split(',')[0]
 
             data = request.json
+            if data is None:
+                return jsonify({'error': 'Invalid JSON data.'}), 400
+                
             expression = data.get('expression', '')
             
             # Block overly long requests
-            if len(expression) > 10000:
+            if len(expression) > 10000000000:
                 return jsonify({'error': 'Expression too long. Please use shorter expressions.'}), 400
             
             settings = {

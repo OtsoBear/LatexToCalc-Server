@@ -397,21 +397,21 @@ class LatexToCalcEngine:
 
     ###################################################################
 
-    def translateSymbols(self, expression: str, dictionary: dict=None):
+    def translateSymbols(self, expression: str, dictionary=None):
         if dictionary is None:
             dictionary = self.symbols
         for key, value in dictionary.items():
             expression = expression.replace(key, value)
         return expression
 
-    def translateGreekLetters(self, expression: str, dictionary: dict=None):
+    def translateGreekLetters(self, expression: str, dictionary=None):
         if dictionary is None:
             dictionary = self.greek_letters
         for key, value in dictionary.items():
             expression = expression.replace(key, value)
         return expression
 
-    def translateArrows(self, expression: str, dictionary: dict=None):
+    def translateArrows(self, expression: str, dictionary=None):
         if not "arrow" in expression:
             return expression
         if dictionary is None:
@@ -472,7 +472,7 @@ class LatexToCalcEngine:
                 expression = expression.replace("###", match, amount-1)
         return expression
   
-    def translateConstants(self, expression: str, dictionary: dict=None):
+    def translateConstants(self, expression: str, dictionary=None):
         if dictionary is None:
             dictionary = self.constantsDict
         for constant, TIconstant in dictionary.items():
@@ -1536,9 +1536,9 @@ class LatexToCalcEngine:
         # Pattern for direct numeric subscripts (_3)
         digit_pattern = r'_(\d+)'
         # Define the subscript digits and the letter mappings
-        subscript_digits = "₀₁₂₃₄₅₆₇₈₉"
+        subscript_digits = "₀₁₂₃₄₅₆₇₈₉" 
         indexDict = {
-            # az
+            # az    
             "a": "", "b": "", "c": "", "d": "", "e": "", "f": "",
             "g": "", "h": "", "i": "", "j": "", "k": "", "l": "",
             "m": "", "n": "", "o": "", "p": "", "q": "", "r": "",
@@ -1550,14 +1550,17 @@ class LatexToCalcEngine:
             "G": "", "H": "", "I": "", "J": "", "K": "", "L": "",
             "M": "", "N": "", "O": "", "P": "", "Q": "", "R": "",
             "S": "", "T": "", "U": "", "V": "", "W": "", "X": "",
-            "Y": "", "Z": ""
+            "Y": "", "Z": "",
+
         }
         
- 
-        # Function to translate characters within the subscript
+        # Function to translate characters within the subscript (function for typechecking)
         def subscript_translator(content):
+            def get_char_translation(char: str) -> str:
+                return indexDict.get(char, char)
+            
             translated = ''.join(
-                subscript_digits[int(char)] if char.isdigit() else indexDict.get(char, char)
+                subscript_digits[int(char)] if char.isdigit() else get_char_translation(char)
                 for char in content
             )
             return translated
@@ -1623,7 +1626,7 @@ def translate(expression, TI_on=True, SC_on=False, constants_on=False, coulomb_o
     
     expression = re.sub(r'\\operatorname\{([a-z]+)\}', r'\\\1', expression)
     expression = engine.translateSymbols(expression)
-    if TI_on: expression = expression.replace("\\Omega", "Ω").replace(",", ".")
+    if TI_on: expression = expression.replace("\\Omega", "Ω").replace(",", ".").replace("_D", "")
 
     expression = engine.translateGreekLetters(expression)
     if constants_on:
@@ -1791,7 +1794,17 @@ def translate(expression, TI_on=True, SC_on=False, constants_on=False, coulomb_o
                 expression = expression.replace("_g"+char, "_g*" + char, 1)
 
     if SC_on: expression = expression.replace("π", "(pi)")
+    print("Expression after SC:", expression)
+    greeksubscripts = {
+        "α": "", "β": "", "γ": "", "δ": "", "ε": "", "ζ": "ζ",
+        "η": "η", "θ": "θ", "ι": "ι", "κ": "κ", "λ": "λ", "μ": "μ",
+        "ν": "ν", "ξ": "ξ", "ο": "ο", "π": "π", "ρ": "ρ", "σ": "σ",
+        "τ": "τ", "υ": "υ", "φ": "φ", "χ": "χ", "ψ": "ψ", "ω": "ω" }
+                           
 
+    for char in ['α', 'β', 'γ', 'δ', 'ε', 'ζ', 'η', 'θ', 'ι', 'κ', 'λ', 'μ', 'ν', 'ξ', 'ο', 'π', 'ρ', 'σ', 'τ', 'υ', 'φ', 'χ', 'ψ', 'ω']:
+        expression = expression.replace(f"_{char}", greeksubscripts[char])
+        
     # Pattern to match: any term ending with subscript followed by a term starting with letter/number
     subscript_chars = "₀₁₂₃₄₅₆₇₈₉"
     subscript_pattern = r'([a-zA-Z0-9]+[' + subscript_chars + r'])([a-zA-Z0-9]+)'
