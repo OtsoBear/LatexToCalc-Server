@@ -35,6 +35,7 @@
             margin: 0;
             padding: 0;
             background-color: #000;
+            background: radial-gradient(ellipse at center, rgba(10, 10, 25, 1) 0%, #000 70%);
             color: #fff;
             font-family: 'Space Mono', monospace;
             overflow-x: hidden;
@@ -203,7 +204,7 @@
         }
         
         .terminal-box:before {
-            content: '';
+            content: '⦿  ⦿  ⦿';
             position: absolute;
             top: 0;
             left: 0;
@@ -214,6 +215,9 @@
             display: flex;
             align-items: center;
             padding-left: 10px;
+            font-size: 14px;
+            line-height: 30px;
+            color: rgba(255, 255, 255, 0.2);
         }
         
         .terminal-content {
@@ -352,6 +356,7 @@
         .skill:hover {
             background-color: rgba(160, 160, 255, 0.3);
             transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(160, 160, 255, 0.1);
         }
         
         .highlight {
@@ -585,7 +590,7 @@
         <h1>Otso Veisterä</h1>
         
         <div class="mystery-text text-reveal" style="--delay: 1">
-            <span class="highlight">Explorer of digital frontiers.</span> Creating solutions at the intersection of science and code. Nationally recognized problem-solver with Finland's best physics report in competition. Fluent in Finnish and English (C2), mathematics and technology.
+            <span class="highlight">An engineer and founder architecting production-ready AI systems from first principles.</span> This fundamental approach was recognized with Finland's national award for the best physics report. Now building scalable SaaS solutions that <span class="highlight">push the boundaries of AI efficiency.</span>
         </div>
         
         <div class="content-grid">
@@ -597,10 +602,11 @@
                         
                         <span class="terminal-command">$ cat skills.txt</span><br>
                         <span class="terminal-output">
-                            <span class="skill">Programming</span>
-                            <span class="skill">Electrical Engineering</span>
+                            <span class="skill">Machine Learning</span>
+                            <span class="skill">AI Development</span>
+                            <span class="skill">Full-Stack Development</span>
+                            <span class="skill">SaaS Architecture</span>
                             <span class="skill">Python</span>
-                            <span class="skill">Problem Solving</span>
                             <span class="skill">Rust</span>
                         </span><br><br>
                         
@@ -621,19 +627,14 @@
                 <div class="terminal-box">
                     <div class="constellation" id="constellation"></div>
                     <div class="terminal-content">
-                        <span class="terminal-tag">&lt;enthusiasm&gt;</span><br>
+                        <span class="terminal-command">$ cat /etc/core_principles.md</span><br>
                         <span class="terminal-output">
-                            Deeply driven by the excitement of learning and exploring a wide variety of projects.
-                        </span><br>
-                        <span class="terminal-tag">&lt;/enthusiasm&gt;</span><br><br>
-                        
-                        <span class="terminal-tag">&lt;strengths&gt;</span><br>
-                        <span class="terminal-output">
-                            Problem solving abilities and fast learning speed
-                        </span><br>
-                        <span class="terminal-tag">&lt;/strengths&gt;</span><br><br>
-                        
-                        <span class="terminal-string">"Eager to harness the power of technology in every project undertaken."</span>
+                            <span># Core Principles</span><br>
+                            <span>- <span class="highlight">Reliability by Design:</span> Architecting systems with graceful degradation and comprehensive testing.</span><br>
+                            <span>- <span class="highlight">First-Principles Thinking:</span> Deconstructing complex problems to build robust, fundamental solutions.</span><br>
+                            <span>- <span class="highlight">Pragmatism > Dogma:</span> Selecting the right tool for the job, not just the most popular one.</span><br>
+                            <span>- <span class="highlight">Execution is Everything:</span> Translating ambitious ideas into production-ready code.</span>
+                        </span>
                     </div>
                 </div>
             </div>
@@ -654,24 +655,23 @@
                 <div class="terminal-box">
                     <div class="terminal-content">
                         <span class="terminal-command">$ cat experience.log | head</span><br><br>
-                        
+
+                        <span class="terminal-tag">[Founder @ Stealth AI Startup]</span> <span class="terminal-comment">// 2024-Present</span><br>
+                        <span class="terminal-output">
+                            Solely founded and architected a production-ready, multi-provider AI API proxy.<br>
+                            Engineered a robust SaaS platform featuring a catch-all universal proxy, a dual authentication system, and graceful degradation with automatic CUDA/CPU fallbacks.
+                        </span><br><br>
+
+                        <span class="terminal-tag">[FR8 Maverick]</span> <span class="terminal-comment">// Jun-Aug 2025</span><br>
+                        <span class="terminal-output">
+                             Selected to be part of the world's first hacker hotel, startup incubator, and research lab, all combined into one. Immersed in an environment dedicated to solving complex problems and building the future.
+                        </span><br><br>
+
                         <span class="terminal-tag">[Planmeca]</span> <span class="terminal-comment">// Jun-Jul 2024</span><br>
                         <span class="terminal-output">
                             Developed AI for 3D medical imaging<br>
                             PyTorch-based segmentation model<br>
                             Improved diagnostic workflows
-                        </span><br>
-                        
-                        <span class="terminal-tag">[4H Federation]</span> <span class="terminal-comment">// Jul 2023</span><br>
-                        <span class="terminal-output">
-                            Led youth development programs<br>
-                            Created engaging learning experiences
-                        </span><br>
-                        
-                        <span class="terminal-tag">[City of Espoo]</span> <span class="terminal-comment">// Jun 2022</span><br>
-                        <span class="terminal-output">
-                            Taught programming through Minecraft<br>
-                            Translated complex concepts for young minds
                         </span><br>
                     </div>
                 </div>
@@ -745,28 +745,20 @@
                 <div class="terminal-box">
                     <div class="terminal-content">
                         <span class="terminal-tag">
-                            <a href="https://github.com/OtsoBear" target="_blank" rel="noopener"> [Rustful Raytracer]</a>
-                        </span><br>                        <span class="terminal-output">
-                            Path tracing engine built from scratch in Rust<br>
-                            <br>
-                            <span class="terminal-comment">// Features</span><br>
-                            Path-traced rendering<br>
-                            Realistic material simulation<br>
-                            Reflection & refraction physics<br>
-                            Physical optics modeling<br>
-                        </span><br>
-                        
-                        <span class="terminal-tag">
-                            <a href="https://www.stuhi.org" target="_blank" rel="noopener">[STUHI.org]</a>
-                        </span><br>
+                            [AI Context Optimizer]
+                        </span><br>                        
                         <span class="terminal-output">
-                            Website developed for free for a non-profit aiming to improve Finland's startup culture<br>
-                            <br>
-                            <span class="terminal-comment">// Features</span><br>
-                            Built with bare HTML, CSS, and JavaScript<br>
-                            Simple, clean, and effective design<br>
-                            Demonstrates my passion and initiative, built entirely by me at no cost
-                        </span>
+                            A production-ready API proxy with transparent, proprietary prompt compression.
+                            <br><br>
+                            <span class="terminal-comment">// Architecture</span><br>
+                            Catch-all universal proxy for multi-provider routing using a 5-tier auto-detection system. Includes direct handling of compressed data streams (gzip, brotli).
+                            <br><br>
+                            <span class="terminal-comment">// Backend & DB</span><br>
+                            Built on FastAPI & async SQLAlchemy 2.0 with a dual-schema usage tracking system and a custom singleton service layer.
+                            <br><br>
+                             <span class="terminal-comment">// Testing & Reliability</span><br>
+                            Architected for high reliability with a comprehensive Pytest suite, featuring transaction rollbacks and advanced async fixtures to ensure code quality.
+                        </span><br>
                     </div>
                 </div>
             </div>
@@ -779,9 +771,8 @@
         <h1>Connect</h1>
         
         <div class="mystery-text text-reveal" style="--delay: 1">
-            <span class="highlight">The journey continues.</span> Currently studying in the selective Data (LuMa) program at Otaniemen Lukio, exploring advanced mathematics and physics while leading multiple student initiatives.
+            My focus is on <span class="highlight">building robust, production-ready systems</span> that solve fundamental problems. This journey, from national physics competitions to founding a startup at FR8, is driven by a passion for execution. I'm always looking to connect with fellow engineers, founders, and researchers who are <span class="highlight">building the future.</span>
         </div>
-        
         <div class="content-grid">
             <div class="grid-item" style="--delay: 2">
                 <div class="terminal-box">
