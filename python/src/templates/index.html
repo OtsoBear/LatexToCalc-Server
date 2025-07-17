@@ -1302,10 +1302,10 @@
         });
 
         function applyDeviceSpecificScaling() {
-            const isMobile = window.innerWidth < 768;
+            const isMobile = window.innerWidth < 900;
             
             if (isMobile) {
-                document.documentElement.style.setProperty('--section-scale', '0.75');
+                document.documentElement.style.setProperty('--section-scale', '0.3');
             } else {
                 const scale = Math.min(0.9, Math.max(0.8, window.innerWidth / 1440));
                 document.documentElement.style.setProperty('--section-scale', scale.toString());
