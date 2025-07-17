@@ -4,6 +4,22 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Otso Veisterä | Portfolio</title>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-YD6KGWH7Y6"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-YD6KGWH7Y6');
+    </script>
+    <script type="text/javascript">
+        (function(c,l,a,r,i,t,y){
+            c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+            t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+            y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+        })(window, document, "clarity", "script", "sg1pyt2jlh");
+    </script>
     <!-- Preload the translation page for instant navigation -->
     <link rel="preload" href="https://otso.veistera.com/translate" as="document">
     <script type="importmap">
@@ -24,8 +40,8 @@
             overflow-x: hidden;
             height: 400vh;
             cursor: default;
-            font-size: 16px; /* Increased base font size from 14px */
-            --section-scale: 1; /* Increased scale factor from 0.85 */
+            font-size: 14px; /* Reduced base font size */
+            --section-scale: 0.85; /* Reduced scale factor */
         }
         
         canvas {
@@ -165,7 +181,7 @@
             background: rgba(10, 10, 25, 0.75);
             border: 1px solid rgba(160, 160, 255, 0.3);
             border-radius: 5px;
-            padding: 20px; /* Increased from 15px */
+            padding: 15px; /* Reduced from 20px */
             font-family: 'Space Mono', monospace;
             color: #a0a0ff;
             max-width: 100%;
@@ -201,8 +217,8 @@
         }
         
         .terminal-content {
-            margin-top: 15px; /* Increased from 12px */
-            line-height: 1.6; /* Increased from 1.5 */
+            margin-top: 12px; /* Reduced from 15px */
+            line-height: 1.5; /* Reduced from 1.6 */
         }
         
         .terminal-tag {
@@ -352,7 +368,7 @@
             border-radius: 20px;
             margin-top: 15px;
             transition: all 0.3s ease;
-            font-size: 1rem; /* Increased from 0.9rem */
+            font-size: 0.9rem; /* Slightly smaller font */
             background-color: rgba(160, 160, 255, 0.1); /* Added background for better visibility */
         }
         
@@ -535,12 +551,12 @@
             
             .mystery-text {
                 width: 95%;
-                padding: 15px; /* Increased from 12px */
-                font-size: 1rem; /* Ensure readable size on mobile */
+                padding: 12px; /* Reduced from 15px */
+                font-size: 0.9rem; /* Slightly reduced font size */
             }
             
             .terminal-box {
-                padding: 15px; /* Adjusted for mobile */
+                padding: 12px; /* Adjusted for mobile */
             }
             
             .terminal-output {

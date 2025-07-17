@@ -52,6 +52,10 @@ def timeout_handler(_signum, _frame):  # Underscore prefix indicates intentional
 def index():
     return render_template("index.html")
 
+@app.route('/coolsite')
+def coolsite():
+    return render_template("coolsite.html")
+
 @app.route('/<path:filename>')
 def serve_file(filename):
     # Serve files from the 'templates' directory
