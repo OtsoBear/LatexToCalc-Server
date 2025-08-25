@@ -56,6 +56,64 @@ def index():
 def coolsite():
     return render_template("coolsite.html")
 
+@app.route('/datrix')
+def datrix():
+    from flask import request, redirect
+    # Default to 2D mode if no parameters specified
+    if not request.args:
+        return redirect('/datrix?font=greek')
+    return send_from_directory('static/matrix', 'index.html')
+
+@app.route('/datrix3d')
+def datrix3d():
+    from flask import request, redirect
+    # 3D mode with volumetric rendering
+    if not request.args:
+        return redirect('/datrix3d?font=greek&volumetric=true&version=3d')
+    return send_from_directory('static/matrix', 'index.html')
+
+@app.route('/megacity')
+def megacity():
+    from flask import request, redirect
+    # Megacity 2D mode
+    if not request.args:
+        return redirect('/megacity?font=greek&version=megacity')
+    return send_from_directory('static/matrix', 'index.html')
+
+@app.route('/megacity3d')
+def megacity3d():
+    from flask import request, redirect
+    # Megacity 3D mode with volumetric rendering
+    if not request.args:
+        return redirect('/megacity3d?font=greek&version=megacity&volumetric=true')
+    return send_from_directory('static/matrix', 'index.html')
+
+@app.route('/datrix/<path:filename>')
+def serve_matrix_files(filename):
+    return send_from_directory('static/matrix', filename)
+
+# Serve Matrix files at root level for proper module loading
+@app.route('/js/<path:filename>')
+def serve_matrix_js_root(filename):
+    return send_from_directory('static/matrix/js', filename)
+
+@app.route('/lib/<path:filename>')
+def serve_matrix_lib_root(filename):
+    return send_from_directory('static/matrix/lib', filename)
+
+@app.route('/assets/<path:filename>')
+def serve_matrix_assets_root(filename):
+    return send_from_directory('static/matrix/assets', filename)
+
+@app.route('/shaders/<path:filename>')
+def serve_matrix_shaders_root(filename):
+    return send_from_directory('static/matrix/shaders', filename)
+
+# General static file serving
+@app.route('/static/<path:filename>')
+def serve_static(filename):
+    return send_from_directory('static', filename)
+
 @app.route('/<path:filename>')
 def serve_file(filename):
     # Serve files from the 'templates' directory
