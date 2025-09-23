@@ -37,7 +37,8 @@ abbreviations = {
 'coulomb_on': 'CL',
 'e_on': 'E',
 'i_on': 'I',
-'g_on': 'G'
+'g_on': 'G',
+'units_on': 'UN'
 }
 
 # Simple timeout handler
@@ -147,7 +148,8 @@ def translate_expression():
                 'coulomb_on': data.get('coulomb_on', False),
                 'e_on': data.get('e_on', False),
                 'i_on': data.get('i_on', False),
-                'g_on': data.get('g_on', False)
+                'g_on': data.get('g_on', False),
+                'units_on': data.get('units_on', True)  # Default to True for backward compatibility
             }
 
             # Create a string of active settings using the first letter of each setting name

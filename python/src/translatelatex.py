@@ -8,9 +8,10 @@ class LatexToCalcEngine:
     - functions used to translate LaTeX expressions
     """
     
-    def __init__(self, TI_on=True, SC_on=False):
+    def __init__(self, TI_on=True, SC_on=False, units_on=False):
         self.TI_on = TI_on
         self.SC_on = SC_on
+        self.units_on = units_on
 
         self.symbols = {
             #
@@ -165,35 +166,109 @@ class LatexToCalcEngine:
             }
 
         self.constantsDict = {
+            # Gravitational constant
             '6.67430*10^{−11}\\text{Nm}^2/\\text{kg}^2': '(_Gc)',
             'γ': '(_Gc)',
+
+            # Speed of light
             'c_0': '(_c)',
+
+            # Rydberg constant
             'R_{∞}': '(_Rdb)',
             '{R}_{∞}': '(_Rdb)',
             '{{R}_{∞}}': '(_Rdb)',
             'R_{\\text{H}}': '(1.0967758*10^7*(1/_m))',
             'R_H': '(1.0967758*10^7*(1/_m))',
-            'g_n': '(Ｇ)',
-            'g_{\\text{n}}': '(Ｇ)',
+
+            # Gravity at Earth
+            #'g': '(_g)', don't know if its gravity or grams
+            'g_n': '(_g)',
+            'g_{\\text{n}}': '(_g)',
+
+            # Standard temperature and pressure
             'T_n': '(293.15_°K)',
             'p_0': '(101325_Pa)',
+
+            # Avogadro
+            'N_a': '(_Na)',
             'N_A': '(_Na)',
             'N_{\\text{A}}': '(_Na)',
+
+            # Molar volume
             'V_m': '(_Vm)',
             'V_{\\text{m}}': '(_Vm)',
-            # 'k': '(_k)', Käännös myöhemmin
+            
+
+
+            # Electron mass
             'm_e': '(_Me)',
             'm_{\\text{e}}': '(_Me)',
+
+            # Proton mass
             'm_p': '(_Mp)',
             'm_{\\text{p}}': '(_Mp)',
+
+            # Neutron mass
             'm_n': '(_Mn)',
             'm_{\\text{n}}': '(_Mn)',
+
+            # Special nuclei
             'm_{\\text{d}}': '(3.3435838*10^{−24}*_g)',
             'm_{α}': '(6.644657*10^{−24}*_g)',
+
+            # Vacuum permittivity
             'ε_0': '(_ε0)',
+            '\\varepsilon_0': '(_ε0)',
+
+            # Stefan–Boltzmann constant
+            'σ': '(_σ)',
+
+            # Faraday
             'F': '(_Fc)',
-            '\\hbar': '(%`´%)/(2*π)',
-            'σ': '(_σ)'
+
+            # Planck
+            #'h': '(_h)',
+            '\\hbar': '(%`´%)/(2*π)', # h handled later because of planck constant vs hr
+            
+            # Boltzmann
+            'k_B': '(_k)',
+            'k_{\\text{B}}': '(_k)',
+            # 'k': '(_k)',  handled later because of kilo
+
+            # Permeability of vacuum
+            'µ_0': '(_µ0)',
+            '\\mu_0': '(_µ0)',
+
+            # Coulomb constant
+            'k_e': '(_Cc)',
+
+            # Bohr magneton
+            'µ_B': '(_mb)',
+            '\\mu_B': '(_mb)',
+
+            # Muon mass
+            'm_µ': '(_Mm)',
+            'm_{\\mu}': '(_Mm)',
+
+            # Electron charge
+            'e': '(_q)',
+
+            # Bohr radius
+            'a_0': '(_Rb)',
+
+            # Molar gas constant
+            'R': '(_Rc)',
+            'R_c': '(_Rc)',
+
+            # Classical electron radius
+            'r_e': '(_Re)',
+
+            # Atomic mass unit
+            'u': '(_u)',
+
+            # Magnetic flux quantum
+            'φ_0': '(_φ0)',
+            '\\phi_0': '(_φ0)',
         }
 
         # prefixes (4)
@@ -1613,8 +1688,8 @@ class LatexToCalcEngine:
 
 
 
-def translate(expression, TI_on=True, SC_on=False, constants_on=False, coulomb_on=False, e_on=False, i_on=False, g_on=False):
-    engine = LatexToCalcEngine(TI_on, SC_on)
+def translate(expression, TI_on=True, SC_on=False, constants_on=False, coulomb_on=False, e_on=False, i_on=False, g_on=False, units_on=False):
+    engine = LatexToCalcEngine(TI_on, SC_on, units_on)
     
     expression = re.sub(r'\\operatorname\{([a-z]+)\}', r'\\\1', expression)
     expression = engine.translateSymbols(expression)
