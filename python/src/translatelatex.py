@@ -1300,7 +1300,6 @@ class LatexToCalcEngine:
             derivative = True
             
         if re.search(r"D", expression):
-            print(expression)
             expression = expression.replace("D", r"{{d}/{dx}}")
             derivative = True
             
@@ -1370,7 +1369,6 @@ class LatexToCalcEngine:
 
         # dot product
         if vector:
-            print(expression)
             for i in range(expression.count('`') // 2):
                 match = re.search(r'\`(\d+)\`\[(.+)\]\`\1\`\*\`(\d+)\`\[(.+)\]\`\3\`', expression)
                 if match:
@@ -1382,7 +1380,6 @@ class LatexToCalcEngine:
 
         # \bar£1£{u}£1£*\bar£2£{v}£2£
         for i in range(expression.count('\\bar') // 2):
-            print(expression)
             match = re.search(r'\\bar\£(\d+)\£\{(.+)\}\£\1\£\*\\bar\£(\d+)\£\{(.+)\}\£\3\£', expression)
             if match:
                 tag1 = '£' + match.group(1) + '£'
@@ -1392,7 +1389,6 @@ class LatexToCalcEngine:
                 expression = expression.replace(f'\\bar{tag1}{vectorA}{tag1}*\\bar{tag2}{vectorB}{tag2}', f'dotP({vectorA},{vectorB})')
 
         for i in range(expression.count('\\overline') // 2):
-            print(expression)
             match = re.search(r'\\overline\£(\d+)\£\{(.+)\}\£\1\£\*\\overline\£(\d+)\£\{(.+)\}\£\3\£', expression)
             if match:
                 tag1 = '£' + match.group(1) + '£'
@@ -1402,7 +1398,6 @@ class LatexToCalcEngine:
                 expression = expression.replace(f'\\overline{tag1}{vectorA}{tag1}*\\overline{tag2}{vectorB}{tag2}', f'dotP({vectorA},{vectorB})')
         
         for i in range(expression.count('\\bar')):
-            print(expression)
             match = re.search(r'\\bar\£(\d+)\£\{(.+)\}\£\1\£\*\\overline\£(\d+)\£\{(.+)\}\£\3\£', expression)
             if match:
                 tag1 = '£' + match.group(1) + '£'
@@ -1412,7 +1407,6 @@ class LatexToCalcEngine:
                 expression = expression.replace(f'\\bar{tag1}{vectorA}{tag1}*\\overline{tag2}{vectorB}{tag2}', f'dotP({vectorA},{vectorB})')
 
         for i in range(expression.count('\\overline')):
-            print(expression)
             match = re.search(r'\\overline\£(\d+)\£\{(.+)\}\£\1\£\*\\bar\£(\d+)\£\{(.+)\}\£\3\£', expression)
             if match:
                 tag1 = '£' + match.group(1) + '£'
@@ -1526,7 +1520,6 @@ class LatexToCalcEngine:
         return expression
 
     def translateSubscripts(self, expression):
-        print(expression)
         # Define the regex pattern to capture content inside curly braces following an underscore
         pattern = r'_(?:[^{]*?)\{(.*?)\}'
         # Pattern for _\text{LETTER} with tags
@@ -1609,7 +1602,6 @@ class LatexToCalcEngine:
                 underscore_pos -= 1
 
             expression = expression[:underscore_pos] + expression[underscore_pos + 1:]   
-        print(expression)
         return expression
     
     def removeIdentifiers(self, expression):
@@ -1794,7 +1786,6 @@ def translate(expression, TI_on=True, SC_on=False, constants_on=False, coulomb_o
                 expression = expression.replace("_g"+char, "_g*" + char, 1)
 
     if SC_on: expression = expression.replace("π", "(pi)")
-    print("Expression after SC:", expression)
     greeksubscripts = {
         "α": "", "β": "", "γ": "", "δ": "", "ε": "", "ζ": "ζ",
         "η": "η", "θ": "θ", "ι": "ι", "κ": "κ", "λ": "λ", "μ": "μ",
