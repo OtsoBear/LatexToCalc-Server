@@ -19,6 +19,8 @@ const makeConfigBuffer = (device, configUniforms, config, density, gridSize, gly
 		slantVec: [Math.cos(config.slant), Math.sin(config.slant)],
 		msdfPxRange: 4,
 		glyphTransform,
+		speedMultiplier: config.speedMultiplier || 1,
+		reverseDirection: config.reverseDirection ? 1 : 0,
 	};
 	// console.table(configData);
 

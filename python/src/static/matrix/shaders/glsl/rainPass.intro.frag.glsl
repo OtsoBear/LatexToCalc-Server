@@ -15,6 +15,8 @@ uniform sampler2D previousIntroState;
 uniform float numColumns, numRows;
 uniform float time, tick;
 uniform float animationSpeed, fallSpeed;
+uniform float speedMultiplier;
+uniform bool reverseDirection;
 
 uniform bool skipIntro;
 
@@ -58,7 +60,7 @@ vec4 computeResult(float simTime, bool isFirstFrame, vec2 glyphPos, vec2 screenP
 }
 
 void main()	{
-	float simTime = time * animationSpeed;
+	float simTime = time * animationSpeed * speedMultiplier;
 	bool isFirstFrame = tick <= 1.;
 	vec2 glyphPos = gl_FragCoord.xy;
 	vec2 screenPos = glyphPos / vec2(numColumns, numRows);

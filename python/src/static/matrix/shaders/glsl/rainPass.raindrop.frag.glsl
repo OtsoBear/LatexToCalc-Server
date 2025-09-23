@@ -20,6 +20,8 @@ uniform sampler2D previousRaindropState, introState;
 uniform float numColumns, numRows;
 uniform float time, tick;
 uniform float animationSpeed, fallSpeed;
+uniform float speedMultiplier;
+uniform bool reverseDirection;
 
 uniform bool loops, skipIntro;
 uniform float brightnessDecay;
@@ -50,27 +52,45 @@ float getRainBrightness(float simTime, vec2 glyphPos) {
 	if (loops) {
 		columnSpeedOffset = 0.5;
 	}
-	float columnTime = columnTimeOffset + simTime * fallSpeed * columnSpeedOffset;
-	float rainTime = (glyphPos.y * 0.01 + columnTime) / raindropLength;
+	float columnTime = columnTimeOffset + simTime * fallSpeed * columnSpeedOffset * speedMultiplier;
+	
+	// Reverse the Y position calculation for upward movement
+	float yPosition = reverseDirection ? (numRows - glyphPos.y) : glyphPos.y;
+	float rainTime = (yPosition * 0.01 + columnTime) / raindropLength;
+	
 	if (!loops) {
 		rainTime = wobble(rainTime);
 	}
-	return 1.0 - fract(rainTime);
+	// Reverse direction if requested
+	if (reverseDirection) {
+		return fract(rainTime);
+	} else {
+		return 1.0 - fract(rainTime);
+	}
 }
 
 // Main function
 
 vec4 computeResult(float simTime, bool isFirstFrame, vec2 glyphPos, vec4 previous, vec4 intro) {
 	float brightness = getRainBrightness(simTime, glyphPos);
-	float brightnessBelow = getRainBrightness(simTime, glyphPos + vec2(0., -1.));
+	
+	// For reverse direction, check above instead of below
+	vec2 neighborOffset = reverseDirection ? vec2(0., 1.) : vec2(0., -1.);
+	float brightnessNeighbor = getRainBrightness(simTime, glyphPos + neighborOffset);
 
 	float introProgress = intro.r - (1. - glyphPos.y / numRows);
-	float introProgressBelow = intro.r - (1. - (glyphPos.y - 1.) / numRows);
+	float introProgressNeighbor = intro.r - (1. - (glyphPos.y + neighborOffset.y) / numRows);
 
 	bool activated = bool(previous.b) || skipIntro || introProgress > 0.;
-	bool activatedBelow = skipIntro || introProgressBelow > 0.;
+	bool activatedNeighbor = skipIntro || introProgressNeighbor > 0.;
 
-	bool cursor = brightness > brightnessBelow || (activated && !activatedBelow);
+	// For reverse direction, invert the cursor logic to maintain same appearance
+	bool cursor;
+	if (reverseDirection) {
+		cursor = brightness < brightnessNeighbor && activated && !activatedNeighbor;
+	} else {
+		cursor = brightness > brightnessNeighbor || (activated && !activatedNeighbor);
+	}
 
 	// Blend the glyph's brightness with its previous brightness, so it winks on and off organically
 	if (!isFirstFrame) {
@@ -83,7 +103,7 @@ vec4 computeResult(float simTime, bool isFirstFrame, vec2 glyphPos, vec4 previou
 }
 
 void main()	{
-	float simTime = time * animationSpeed;
+	float simTime = time * animationSpeed * speedMultiplier;
 	bool isFirstFrame = tick <= 1.;
 	vec2 glyphPos = gl_FragCoord.xy;
 	vec2 screenPos = glyphPos / vec2(numColumns, numRows);

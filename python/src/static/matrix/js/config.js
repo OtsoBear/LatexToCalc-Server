@@ -92,7 +92,9 @@ const defaults = {
 	glintIntensity: 1, // The intensity of the glint
 	volumetric: false, // A mode where the raindrops appear in perspective
 	animationSpeed: 1, // The global rate that all animations progress
-	fps: 60, // The target frame rate (frames per second) of the effect
+	speedMultiplier: 1, // Additional speed multiplier for the animation
+	reverseDirection: false, // Whether to reverse the rain direction (upward instead of downward)
+	fps: 144, // Target 144fps - will automatically cap at display refresh rate
 	forwardSpeed: 0.25, // The speed volumetric rain approaches the eye
 	bloomStrength: 0.7, // The intensity of the bloom
 	bloomSize: 0.4, // The amount the bloom calculation is scaled
@@ -517,6 +519,11 @@ const paramMapping = {
 		key: "glyphRotation",
 		parser: (s) => nullNaN(range(parseFloat(s), 0, Infinity)),
 	},
+	speedMultiplier: {
+		key: "speedMultiplier",
+		parser: (s) => nullNaN(range(parseFloat(s), 0.1, 10)),
+	},
+	reverseDirection: { key: "reverseDirection", parser: isTrue },
 	loops: { key: "loops", parser: isTrue },
 	fps: { key: "fps", parser: (s) => nullNaN(range(parseFloat(s), 0, 60)) },
 	skipIntro: { key: "skipIntro", parser: isTrue },

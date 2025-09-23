@@ -4,6 +4,8 @@
 struct Config {
 	// common properties used for compute and rendering
 	animationSpeed : f32,
+	speedMultiplier : f32,
+	reverseDirection : i32,
 	glyphSequenceLength : f32,
 	glyphTextureGridSize : vec2<i32>,
 	glyphHeightToWidth : f32,
@@ -161,12 +163,21 @@ fn getRainBrightness(simTime : f32, glyphPos : vec2<f32>) -> f32 {
 	if (bool(config.loops)) {
 		columnSpeedOffset = 0.5;
 	}
-	var columnTime = columnTimeOffset + simTime * config.fallSpeed * columnSpeedOffset;
-	var rainTime = (glyphPos.y * 0.01 + columnTime) / config.raindropLength;
+	var columnTime = columnTimeOffset + simTime * config.fallSpeed * columnSpeedOffset * config.speedMultiplier;
+	
+	// Reverse the Y position calculation for upward movement
+	var yPosition = select(glyphPos.y, config.gridSize.y - glyphPos.y, bool(config.reverseDirection));
+	var rainTime = (yPosition * 0.01 + columnTime) / config.raindropLength;
+	
 	if (!bool(config.loops)) {
 		rainTime = wobble(rainTime);
 	}
-	return 1.0 - fract(rainTime);
+	// Reverse direction if requested
+	if (bool(config.reverseDirection)) {
+		return fract(rainTime);
+	} else {
+		return 1.0 - fract(rainTime);
+	}
 }
 
 // Compute shader additional effects
@@ -245,16 +256,25 @@ fn computeIntroProgress (simTime : f32, isFirstFrame : bool, glyphPos : vec2<f32
 fn computeRaindrop (simTime : f32, isFirstFrame : bool, glyphPos : vec2<f32>, screenPos : vec2<f32>, previous : vec4<f32>, progress : vec4<f32>) -> vec4<f32> {
 
 	var brightness = getRainBrightness(simTime, glyphPos);
-	var brightnessBelow = getRainBrightness(simTime, glyphPos + vec2(0.0, -1.0));
+	
+	// For reverse direction, check above instead of below
+	var neighborOffset = select(vec2(0.0, -1.0), vec2(0.0, 1.0), bool(config.reverseDirection));
+	var brightnessNeighbor = getRainBrightness(simTime, glyphPos + neighborOffset);
 
 	var introProgress = progress.r - (1.0 - glyphPos.y / config.gridSize.y);
-	var introProgressBelow = progress.r - (1.0 - (glyphPos.y - 1.0) / config.gridSize.y);
+	var introProgressNeighbor = progress.r - (1.0 - (glyphPos.y + neighborOffset.y) / config.gridSize.y);
 
 	var skipIntro = bool(config.skipIntro);
 	var activated = bool(previous.b) || skipIntro || introProgress > 0.0;
-	var activatedBelow = skipIntro || introProgressBelow > 0.0;
+	var activatedNeighbor = skipIntro || introProgressNeighbor > 0.0;
 
-	var cursor = brightness > brightnessBelow || (activated && !activatedBelow);
+	// For reverse direction, invert the cursor logic to maintain same appearance
+	var cursor : bool;
+	if (bool(config.reverseDirection)) {
+		cursor = brightness < brightnessNeighbor && activated && !activatedNeighbor;
+	} else {
+		cursor = brightness > brightnessNeighbor || (activated && !activatedNeighbor);
+	}
 
 	// Blend the glyph's brightness with its previous brightness, so it winks on and off organically
 	if (!isFirstFrame) {
@@ -312,7 +332,7 @@ fn computeEffect (simTime : f32, isFirstFrame : bool, glyphPos : vec2<f32>, scre
 		return;
 	}
 
-	var simTime = time.seconds * config.animationSpeed;
+	var simTime = time.seconds * config.animationSpeed * config.speedMultiplier;
 	var isFirstFrame = time.frames == 0;
 
 	// Update the cell
@@ -336,7 +356,7 @@ fn computeEffect (simTime : f32, isFirstFrame : bool, glyphPos : vec2<f32>, scre
 
 	var i = row * i32(config.gridSize.x) + column;
 
-	var simTime = time.seconds * config.animationSpeed;
+	var simTime = time.seconds * config.animationSpeed * config.speedMultiplier;
 	var isFirstFrame = time.frames == 0;
 
 	// Update the cell
@@ -382,7 +402,7 @@ var<private> quadCorners : array<vec2<f32>, NUM_VERTICES_PER_QUAD> = array<vec2<
 	var quadDepth = 0.0;
 	if (volumetric) {
 		var startDepth = randomFloat(vec2(quadPosition.x, 0.0));
-		quadDepth = fract(startDepth + time.seconds * config.animationSpeed * config.forwardSpeed);
+		quadDepth = fract(startDepth + time.seconds * config.animationSpeed * config.speedMultiplier * config.forwardSpeed);
 	}
 
 	// Calculate the vertex's world space position

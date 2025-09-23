@@ -55,7 +55,7 @@ export default ({ regl, config, lkg }) => {
 	mat2.rotate(glyphTransform, glyphTransform, (config.glyphRotation * Math.PI) / 180);
 
 	const commonUniforms = {
-		...extractEntries(config, ["animationSpeed", "glyphHeightToWidth", "glyphSequenceLength", "glyphTextureGridSize"]),
+		...extractEntries(config, ["animationSpeed", "speedMultiplier", "reverseDirection", "glyphHeightToWidth", "glyphSequenceLength", "glyphTextureGridSize"]),
 		numColumns,
 		numRows,
 		showDebugView,
