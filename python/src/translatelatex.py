@@ -8,7 +8,7 @@ class LatexToCalcEngine:
     - functions used to translate LaTeX expressions
     """
     
-    def __init__(self, TI_on=True, SC_on=False, units_on=False):
+    def __init__(self, TI_on=True, SC_on=False, units_on=True):
         self.TI_on = TI_on
         self.SC_on = SC_on
         self.units_on = units_on
@@ -558,7 +558,8 @@ class LatexToCalcEngine:
         return expression
 
     def translateUnits1(self, expression):
-        if not ("\\mathrm" in expression or "\\text" in expression):
+        # Skip unit processing if units_on is False AND there are no unit markers in the expression
+        if not self.units_on and not ("\\mathrm" in expression or "\\text" in expression):
             return expression
         for i in range(expression.count("\\mathrm")):
             match = re.search(r'\\mathrm\£(\d+)\£\{(.+)\}\£\1\£', expression)
@@ -636,7 +637,7 @@ class LatexToCalcEngine:
                     # units (5)
                     for unit, full_unit in self.SC_units.items():
                         if "\\text{" + unit + "}" in expression:
-                            expression = expression.replace("\\text{" + unit + "}", full_unit)
+                            expression = expression.replace("\\text{" + unit + "}", full_unit)   
 
         for fix in self.fixlist:
             if "⁃" + fix in expression:
@@ -1688,7 +1689,7 @@ class LatexToCalcEngine:
 
 
 
-def translate(expression, TI_on=True, SC_on=False, constants_on=False, coulomb_on=False, e_on=False, i_on=False, g_on=False, units_on=False):
+def translate(expression, TI_on=True, SC_on=False, constants_on=False, coulomb_on=False, e_on=False, i_on=False, g_on=False, units_on=True):
     engine = LatexToCalcEngine(TI_on, SC_on, units_on)
     
     expression = re.sub(r'\\operatorname\{([a-z]+)\}', r'\\\1', expression)
@@ -1912,7 +1913,8 @@ coulomb_on = False
 
 
 if __name__ == "__main__":
-    print(translate(r"\\frac{translatelatex}{ran}"))
-    print(translate(r"K_\text{a}"))
+    print(translate(r"\\frac{4g}{mol}"))
+    #print(translate(r"\\frac{translatelatex}{ran}"))
+    #print(translate(r"K_\text{a}"))
 else:
     print("Translatelatex.py loaded")
