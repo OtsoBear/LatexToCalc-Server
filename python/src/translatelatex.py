@@ -1877,8 +1877,14 @@ def translate(expression, TI_on=True, SC_on=False, constants_on=False, coulomb_o
     subscript_pattern = r'([a-zA-Z0-9]+[' + subscript_chars + r'])([a-zA-Z0-9]+)'
     expression = re.sub(subscript_pattern, r'\1*\2', expression)
     
-    # yleisiä suureyhtälökohtia
+    #regex rule to add asteriks between underscore and letter on the left side of it, e.g. m_g*h -> m*_g*h
+    letter_underscore_pattern = r'([a-zA-Z])(_[a-zA-Z])'
+    expression = re.sub(letter_underscore_pattern, r'\1*\2', expression)
+    
+    
     addAsterisk = {
+        ")_": ")*_",
+        "ma": "m*a",
         "mv": "m*v",
      #   "at": "a*t",
       #  "vt": "v*t",
