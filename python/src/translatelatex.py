@@ -111,7 +111,7 @@ class LatexToCalcEngine:
             '\\Alpha': 'Α',
             '\\Beta': 'Β',
             '\\Gamma': 'Γ',
-            '\\Delta': 'Δ',
+            '\\Delta': '∆', #using increment U+2206 instead of Greek Delta U+0394, because TI-nspire turns into small delta when pasting
             '\\Epsilon': 'Ε',
             '\\Zeta': 'Ζ',
             '\\Eta': 'Η',
@@ -172,7 +172,7 @@ class LatexToCalcEngine:
 
             # Speed of light
             'c_0': '(_c)',
-
+            # 'c': '(_c)',  handled later because of fracs ect.
             # Rydberg constant
             'R_{∞}': '(_Rdb)',
             '{R}_{∞}': '(_Rdb)',
@@ -224,7 +224,7 @@ class LatexToCalcEngine:
             'σ': '(_σ)',
 
             # Faraday
-            'F': '(_Fc)',
+            #'F': '(_Fc)', breaks F=ma
 
             # Planck
             #'h': '(_h)',
@@ -250,8 +250,11 @@ class LatexToCalcEngine:
             'm_µ': '(_Mm)',
             'm_{\\mu}': '(_Mm)',
 
-            # Electron charge
-            'e': '(_q)',
+            # Elementary charge
+            #'q': '(_q)', do later
+            #'Q': '(_q)'
+            'q_e': '(_q)',
+            'Q_e': '(_q)',
 
             # Bohr radius
             'a_0': '(_Rb)',
@@ -547,7 +550,7 @@ class LatexToCalcEngine:
                 expression = expression.replace("###", match, amount-1)
         return expression
   
-    def translateConstants(self, expression: str, dictionary=None):
+    def translateConstants(self, expression: str, dictionary: dict=None):
         if dictionary is None:
             dictionary = self.constantsDict
         for constant, TIconstant in dictionary.items():
@@ -560,6 +563,7 @@ class LatexToCalcEngine:
     def translateUnits1(self, expression):
         # Skip unit processing if units_on is False AND there are no unit markers in the expression
         if not self.units_on and not ("\\mathrm" in expression or "\\text" in expression):
+            print("no text here", expression)
             return expression
         for i in range(expression.count("\\mathrm")):
             match = re.search(r'\\mathrm\£(\d+)\£\{(.+)\}\£\1\£', expression)
@@ -1295,7 +1299,7 @@ class LatexToCalcEngine:
                     expression = expression.replace(match, "###", amount-1)
                     expression = expression.replace(match, tag + match + tag, 1)
                     expression = expression.replace("###", match, amount-1)
-            
+            print(expression)
             for i in range(expression.count("¤")):
                 # \int _{12}^{34}xdx
                 match = re.search(r'\§(\d+)\§¤\£(\d+)\£\{(.+)\}\£\2\£\^\£(\d+)\£\{(.+)\}\£\4\£(.+)d\§\1\§([a-ce-zA-Z0-9α-ωΑ-Ω])', expression)
@@ -1353,6 +1357,7 @@ class LatexToCalcEngine:
                     )
                     
                 # \int _{ }^{ }x\ dx
+                
                 match = re.search(r'\§(\d+)\§¤\£(\d+)\£{}\£\2\£\^\£(\d+)\£{}\£\3\£(.+)d\§\1\§([a-ce-zA-Z0-9α-ωΑ-Ω])', expression)
                 if match:
                     tagInt = "§" + match.group(1) + "§"
@@ -1684,7 +1689,7 @@ class LatexToCalcEngine:
         patterns = [r'\£([0-9]+)\£', r'\$([0-9]+)\$', r'\`([0-9]+)\`', r'\§([0-9]+)\§']
         for pattern in patterns:
             expression = re.sub(pattern, r'', expression)
-        expression = expression.replace("¤", "int_").replace("⁃", "").replace("』", "")
+        expression = expression.replace("¤", "int_").replace("』", "").replace("⁃", "_")
         return expression
 
 
@@ -1831,6 +1836,15 @@ def translate(expression, TI_on=True, SC_on=False, constants_on=False, coulomb_o
         for match in matches:
             expression = expression.replace(match + fix, match + "*" + fix)
 
+    #Replace metric prefixes with built-in units
+    built_in_units = {
+        "10^3*_gm": "_kg",
+        "10^(-6)*_gm": "_mg",
+    }
+    for old, new in built_in_units.items():
+        expression = expression.replace(old, new)
+        
+        
     fixAsterisk = {
     "lcm*": "lcm",
     "gcd*": "gcd",
@@ -1876,7 +1890,12 @@ def translate(expression, TI_on=True, SC_on=False, constants_on=False, coulomb_o
     subscript_chars = "₀₁₂₃₄₅₆₇₈₉"
     subscript_pattern = r'([a-zA-Z0-9]+[' + subscript_chars + r'])([a-zA-Z0-9]+)'
     expression = re.sub(subscript_pattern, r'\1*\2', expression)
-    
+    # replace c with _c if constants on, only if no chain of letters before it which would have and underscore before them (e.g. mc -> m*_c, but not in _Rc)
+
+
+    # replace mol wiith _mol if units on
+    if units_on:
+        expression = expression.replace("mol", "_mol")
     #regex rule to add asteriks between underscore and letter on the left side of it, e.g. m_g*h -> m*_g*h
     letter_underscore_pattern = r'([a-zA-Z])(_[a-zA-Z])'
     expression = re.sub(letter_underscore_pattern, r'\1*\2', expression)
@@ -1891,17 +1910,28 @@ def translate(expression, TI_on=True, SC_on=False, constants_on=False, coulomb_o
         "mgh": "m*g*h",
       #  "mg": "m*g",
         "ρgh": "ρ*g*h",
-      #  "mc": "m*c",
+        "mc": "m*c",  # E=mc^2
         "cmΔT": "c*m*ΔT",
         "CΔT": "C*ΔT",
         "αl₀ΔT": "α*l₀*ΔT",
         "βl₀ΔT": "β*l₀*ΔT",
-        "γl₀ΔT": "γ*l₀*ΔT"
+        "γl₀ΔT": "γ*l₀*ΔT",
+        "vB": "v*B"  # Magnetic force formula
     }
     for org, new in addAsterisk.items():
         expression = expression.replace(org, new)
         
-    
+    # replace c with _c if constants on
+    # Must be done after addAsterisk to handle cases like mc -> m*c -> m*_c
+    # Don't replace if c is part of an existing constant identifier pattern:
+    # - _Xc (single letter + c, like _Rc)
+    # - _XXc (two letters + c, like _Ccc)
+    if constants_on:
+        # Use alternation with fixed-width lookbehinds
+        # This regex will NOT match c when preceded by:
+        # - underscore followed by single letter (like _Rc)
+        # - underscore followed by two letters (like _Ccc)
+        expression = re.sub(r'(?<!_[a-zA-Z])(?<!_[a-zA-Z][a-zA-Z])c', '_c', expression)
     
     return expression
 
@@ -1920,6 +1950,7 @@ coulomb_on = False
 
 if __name__ == "__main__":
     print(translate(r"\\frac{4g}{mol}"))
+    print(translate(r"10\\text{m}"))
     #print(translate(r"\\frac{translatelatex}{ran}"))
     #print(translate(r"K_\text{a}"))
 else:
