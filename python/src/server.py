@@ -121,6 +121,7 @@ def serve_file(filename):
     return send_from_directory(path.join('src', 'templates', 'reference', 'modules', 'ROOT'), filename)
 
 @app.route('/translate', methods=['POST', 'GET', 'OPTIONS'])
+@app.route('/translate/', methods=['POST', 'GET', 'OPTIONS'])
 def translate_expression():
     if request.method == 'POST':
         # Handle POST requests (e.g., translating an expression)
