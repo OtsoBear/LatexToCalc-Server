@@ -13,7 +13,7 @@ from src.translatelatex import translate
 # TEST DATA STRUCTURES
 # ========================================================================
 
-class TestCase:
+class LaTeXTestCase:
     """Simple test case class for clarity"""
     def __init__(self, latex_input, expected_output, description="", params=None):
         self.latex_input = latex_input
@@ -22,7 +22,7 @@ class TestCase:
         self.params = params or {}
     
     def __repr__(self):
-        return f"TestCase({self.description or self.latex_input[:20]}...)"
+        return f"LaTeXTestCase({self.description or self.latex_input[:20]}...)"
 
 
 # ========================================================================
@@ -31,121 +31,121 @@ class TestCase:
 
 BASIC_TESTS = [
     # Fractions
-    TestCase(
+    LaTeXTestCase(
         r"x=\\frac{1}{2}", 
         "x=((1)/(2))",
         "Simple fraction"
     ),
-    TestCase(
+    LaTeXTestCase(
         r"y=xy^1+\\frac{1}{1^1}", 
         "y=x*y^1+((1)/(1^1))",
         "Mixed expression with fraction"
     ),
     
     # Subscripts
-    TestCase(
+    LaTeXTestCase(
         r"m_1m_2", 
         "m₁*m₂",
         "Variable subscripts next to each other"
     ),
-    TestCase(
+    LaTeXTestCase(
         r"T_\alpha + T_D = Q'",
         "T+T=Q'",  # Note: Greek letters become subscripts
         "Greek and regular subscripts"
     ),
     
     # Combinations
-    TestCase(
+    LaTeXTestCase(
         r"\binom{n}{k}=\frac{n!}{k!(n-k)!}", 
         "nCr(n,k)=((n!)/(k!(n-k)!))",
         "Binomial coefficient"
     ),
     
     # Roots
-    TestCase(
+    LaTeXTestCase(
         r"\sqrt[n]{a}", 
         "root(a,n)",
         "Nth root"
     ),
-    TestCase(
+    LaTeXTestCase(
         r"{{a}^{\frac{1}{n}}}", 
         "((a)^(((1)/(n))))",
         "Power as root"
     ),
     
     # Logarithms
-    TestCase(
+    LaTeXTestCase(
         r"\log_ex", 
         "log(x,e)",
         "Logarithm with base"
     ),
     
     # Vectors
-    TestCase(
+    LaTeXTestCase(
         r"\overline{AB}", 
         "(AB)",
         "Vector notation"
     ),
-    TestCase(
+    LaTeXTestCase(
         r"\bar{a}\cdot \bar{b}", 
         "dotP((a),(b))",
         "Dot product"
     ),
-    TestCase(
+    LaTeXTestCase(
         r"\bar{a}\times \bar{b}", 
         "crossP((a),(b))",
         "Cross product"
     ),
     
     # Functions
-    TestCase(
+    LaTeXTestCase(
         r"f_{Auto}",
         "f",  # Note: Auto becomes subscript characters
         "Function with subscript"
     ),
-    TestCase(
+    LaTeXTestCase(
         r"t^{2\cdot 2}", 
         "t^(2*2)",
         "Exponent with operation"
     ),
     
     # Limits
-    TestCase(
+    LaTeXTestCase(
         r"\lim _{x\rightarrow \infty ^-}\left(x+1\right)", 
         "lim(x+1,x,∞,-1)",
         "Limit to negative infinity"
     ),
     
     # Integrals
-    TestCase(
+    LaTeXTestCase(
         r"\int _{ }^{ }f\left(x\right)dx", 
         "∫((f*(x)),(x))",
         "Indefinite integral"
     ),
-    TestCase(
+    LaTeXTestCase(
         r"\int _{0}^{\infty }e^{-x}dx", 
         "∫((e^(-x)),(x),(0),(∞))",
         "Definite integral to infinity"
     ),
     # Units and angles
-    TestCase(
+    LaTeXTestCase(
         r"30°\cdot \frac{\pi }{180°}", 
         "30°*((π)/(180°))",
         "Degree conversion"
     ),
     
     # Derivatives
-    TestCase(
+    LaTeXTestCase(
         r"\frac{d}{dx}\left(\frac{x}{180\sin \left(\pi \right)}\right)",
         "(((x)/(180*sin(π))),x)",  # Note: TI Nspire uses special Unicode char for derivative
         "Derivative notation"
     ),
-    TestCase(
+    LaTeXTestCase(
         r"\frac{d}{dt}\left(t^2\cdot\frac{d}{dx}\left(3x^2\right)\right)",
         "(t^2*(3*x^2,x),t)",  # Note: Nested derivatives with special char
         "Nested derivatives"
     ),
-    TestCase(
+    LaTeXTestCase(
         r"D\left(3x^{22}\right)",
         "\uf008(3*x^(22),x)",  # Note: D notation includes special char
         "D notation for derivative"
@@ -158,18 +158,18 @@ BASIC_TESTS = [
 # ========================================================================
 
 SC_MODE_TESTS = [
-    TestCase(
-        r"\binom{n}{k}", 
+    LaTeXTestCase(
+        r"\binom{n}{k}",
         "nCr(n;k)",  # Note: SC mode uses semicolon
         "Binomial in SC mode"
     ),
-    TestCase(
-        r"\pi", 
+    LaTeXTestCase(
+        r"\pi",
         "(pi)",
         "Pi in SC mode"
     ),
-    TestCase(
-        r"\log_{2}8", 
+    LaTeXTestCase(
+        r"\log_{2}8",
         "log(2;8)",  # SC mode format
         "Log with base in SC mode"
     ),
@@ -181,22 +181,22 @@ SC_MODE_TESTS = [
 # ========================================================================
 
 CONSTANTS_TESTS = [
-    TestCase(
+    LaTeXTestCase(
         r"F=ma",
         "F=m*a",  # Note: F becomes Faraday constant if its enabled
         "Force equation"
     ),
-    TestCase(
+    LaTeXTestCase(
         r"E=mc^2",
         "E=m*_c^2",  # Note: c becomes speed of light constant
         "Energy equation"
     ),
-    TestCase(
+    LaTeXTestCase(
         r"h\cdot v",
         "_h*v",  # Note: constants_on alone doesn't change h without \hbar
         "Planck constant"
     ),
-    TestCase(
+    LaTeXTestCase(
         r"F=Q_evB",
         "F=(_q)*v*B",  # Note: Q_e becomes elementary charge constant
         "Magnetic force equation"
@@ -210,24 +210,24 @@ CONSTANTS_TESTS = [
 
 SPECIAL_SYMBOLS_TESTS = [
     # e_on=True tests
-    TestCase(
-        r"e^x", 
+    LaTeXTestCase(
+        r"e^x",
         "@e^x",
         "Euler's number",
         params={"e_on": True}
     ),
     
     # i_on=True tests
-    TestCase(
-        r"z=x+iy", 
+    LaTeXTestCase(
+        r"z=x+iy",
         "z=x+@iy",
         "Complex number",
         params={"i_on": True}
     ),
     
     # g_on=True tests
-    TestCase(
-        r"g=9.8", 
+    LaTeXTestCase(
+        r"g=9.8",
         "_g=9.8",
         "Gravity constant",
         params={"g_on": True}
@@ -240,14 +240,14 @@ SPECIAL_SYMBOLS_TESTS = [
 # ========================================================================
 
 UNITS_TESTS = [
-    TestCase(
-        r"\text{kg}", 
+    LaTeXTestCase(
+        r"\text{kg}",
         "(_kg)",
         "Kilogram unit",
         params={"units_on": True}
     ),
-    TestCase(
-        r"10\text{m}", 
+    LaTeXTestCase(
+        r"10\text{m}",
         "10*(_m)",
         "Meter with value",
         params={"units_on": True}
@@ -261,19 +261,19 @@ UNITS_TESTS = [
 # ========================================================================
 
 COMBINED_PARAMS_TESTS = [
-    TestCase(
+    LaTeXTestCase(
         r"F=k\frac{q_1q_2}{r^2}",
         "F=_Cc*((q₁*q₂)/(r^2))",
         "Coulomb's law",
         params={"coulomb_on": True}
     ),
-    TestCase(
+    LaTeXTestCase(
         r"E=\frac{1}{2}mv^2+mgh",
         "E=((1)/(2))*m*v^2+m*_g*h",
         "Energy equation with gravity",
         params={"g_on": True}
     ),
-    TestCase(
+    LaTeXTestCase(
         r"e^{i\pi}+1=0",
         "@e^(@iπ)+1=0",
         "Euler's identity",
@@ -458,20 +458,20 @@ def test_edge_cases():
     """Test edge cases and potential problem areas"""
     edge_cases = [
         # Empty expressions
-        TestCase("", "", "Empty string"),
+        LaTeXTestCase("", "", "Empty string"),
         
         # Single character
-        TestCase("x", "x", "Single variable"),
+        LaTeXTestCase("x", "x", "Single variable"),
         
         # Complex nested structures
-        TestCase(
-            r"\sqrt{\frac{1}{\sqrt{2}}}", 
+        LaTeXTestCase(
+            r"\sqrt{\frac{1}{\sqrt{2}}}",
             "sqrt(((1)/(sqrt(2))))",
             "Nested sqrt and fraction"
         ),
         
         # Multiple operations
-        TestCase(
+        LaTeXTestCase(
             r"a+b-c*d/e",
             "a+b-c*d/e",
             "Multiple operations"
