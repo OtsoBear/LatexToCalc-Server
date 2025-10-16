@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Portfolio of Otso Veisterä, an AI engineer and founder building production-ready solutions and pushing the boundaries of AI.">
     <title>Otso Veisterä | Portfolio</title>
+    <link rel="icon" type="image/x-icon" href="/static/bear.ico">
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-YD6KGWH7Y6"></script>
     <script>
@@ -32,6 +33,10 @@
     </script>
     <script src="https://unpkg.com/es-module-shims@1.5.0/dist/es-module-shims.js"></script>
     <style>
+        html {
+            background: #000;
+        }
+        
         body {
             margin: 0;
             padding: 0;
@@ -50,7 +55,8 @@
             position: fixed;
             top: 0;
             left: 0;
-            z-index: -1;
+            z-index: 0;
+            pointer-events: none;
         }
         
         .section {
@@ -64,7 +70,7 @@
             opacity: 0;
             transition: all 0.8s ease;
             pointer-events: none;
-            z-index: 1;
+            z-index: 10;
             padding: 0 10px; /* Add padding for better content visibility */
             box-sizing: border-box; /* Include padding in width calculation */
             transform: scale(var(--section-scale)); /* Scale down all sections */
@@ -222,19 +228,29 @@
         }
         
         .terminal-content {
-            margin-top: 12px; /* Reduced from 15px */
-            line-height: 1.5; /* Reduced from 1.6 */
+            margin-top: 35px; /* Increased to prevent clipping with terminal header */
+            line-height: 1.5;
         }
         
         .terminal-tag {
             color: #7a7aea;
-            font-size: 0.95rem; /* Slightly smaller than content */
+            font-size: 0.95rem;
+        }
+        
+        .terminal-tag a {
+            color: #60a5fa; /* Softer blue for links */
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        
+        .terminal-tag a:hover {
+            color: #93c5fd; /* Lighter blue on hover */
         }
         
         .terminal-command {
-            color: #64ff64;
-            opacity: 0.7; /* Reduced prominence */
-            font-size: 0.95rem; /* Slightly smaller than content */
+            color: #6b7280; /* Grey for all commands */
+            opacity: 0.5;
+            font-size: 0.95rem;
         }
         
         .terminal-string {
@@ -251,6 +267,21 @@
             color: #ffffff;
             font-size: 1.05rem;
             line-height: 1.7;
+        }
+        
+        .json-key {
+            color: #9ca3af; /* Grey for keys - not highlighted */
+            font-weight: normal;
+        }
+        
+        .json-string {
+            color: #86efac; /* Bright green for string values - highlighted */
+            font-weight: 500;
+        }
+        
+        .json-punctuation {
+            color: #6b7280; /* Dark grey for braces/commas */
+            opacity: 0.5;
         }
         
 .terminal-output span {
@@ -590,10 +621,6 @@
     <section class="section active" id="section0" data-depth="0">
         <h1>Otso Veisterä</h1>
         
-        <div class="mystery-text text-reveal" style="--delay: 1">
-            <span class="highlight">An engineer and founder architecting production-ready AI systems from first principles.</span> This fundamental approach was recognized with Finland's national award for the best physics report. Now building scalable SaaS solutions that <span class="highlight">push the boundaries of AI efficiency.</span>
-        </div>
-        
         <div class="content-grid">
             <div class="grid-item" style="--delay: 2">
                 <div class="terminal-box">
@@ -623,22 +650,6 @@
                 </div>
             </div>
             
-            <div class="grid-item" style="--delay: 3">
-                <!-- Moved constellation inside terminal box for better layout -->
-                <div class="terminal-box">
-                    <div class="constellation" id="constellation"></div>
-                    <div class="terminal-content">
-                        <span class="terminal-command">$ cat /etc/core_principles.md</span><br>
-                        <span class="terminal-output">
-                            <span># Core Principles</span><br>
-                            <span>- <span class="highlight">Reliability by Design:</span> Architecting systems with graceful degradation and comprehensive testing.</span><br>
-                            <span>- <span class="highlight">First-Principles Thinking:</span> Deconstructing complex problems to build robust, fundamental solutions.</span><br>
-                            <span>- <span class="highlight">Pragmatism > Dogma:</span> Selecting the right tool for the job, not just the most popular one.</span><br>
-                            <span>- <span class="highlight">Execution is Everything:</span> Translating ambitious ideas into production-ready code.</span>
-                        </span>
-                    </div>
-                </div>
-            </div>
         </div>
         
         <a href="#" class="contact-button" onclick="scrollToSection(1); return false;">Discover More</a>
@@ -647,20 +658,15 @@
     <section class="section" id="section1" data-depth="1">
         <h1>Experience</h1>
         
-        <div class="mystery-text text-reveal" style="--delay: 1">
-            <span class="highlight">From award-winning research to production-ready systems.</span> Each experience has been a step toward building robust, scalable, and significant technology.
-        </div>
-        
         <div class="content-grid">
             <div class="grid-item" style="--delay: 2">
                 <div class="terminal-box">
                     <div class="terminal-content">
                         <span class="terminal-command">$ cat experience.log | head</span><br><br>
 
-                        <span class="terminal-tag">[Founder @ Stealth AI Startup]</span> <span class="terminal-comment">// 2024-Present</span><br>
+                        <span class="terminal-tag">[Entrepreneur In Residence @ Lifeline Ventures]</span> <span class="terminal-comment">// Sep 2025-Present</span><br>
                         <span class="terminal-output">
-                            Solely founded and architected a production-ready, multi-provider AI API proxy.<br>
-                            Engineered a robust SaaS platform featuring a catch-all universal proxy, a dual authentication system, and graceful degradation with automatic CUDA/CPU fallbacks.
+                            Building an AI compression startup with support from Lifeline Ventures.<br>
                         </span><br><br>
 
                         <span class="terminal-tag">[FR8 Maverick]</span> <span class="terminal-comment">// Jun-Aug 2025</span><br>
@@ -677,52 +683,21 @@
                     </div>
                 </div>
             </div>
-            
-            <div class="grid-item" style="--delay: 3">
-                <div class="terminal-box">
-                    <div class="terminal-content">
-                        <span class="terminal-command">$ grep -A 3 "achievement" career.json</span><br>
-                        <span class="terminal-output">
-                            {<br>
-                            &nbsp;&nbsp;"highlight": "33 bugs identified in one week",<br>
-                            &nbsp;&nbsp;"location": "Planmeca internship",<br>
-                            &nbsp;&nbsp;"skill": "Exceptional attention to detail"<br>
-                            }<br>
-                            {<br>
-                            &nbsp;&nbsp;"highlight": "Electronics & microcontroller development",<br>
-                            &nbsp;&nbsp;"location": "Aalto Design Factory",<br>
-                            &nbsp;&nbsp;"skill": "Electrical engineering"<br>
-                            }<br>
-                            {<br>
-                            &nbsp;&nbsp;"highlight": "Finland's top physics report",<br>
-                            &nbsp;&nbsp;"location": "Harppi science competition",<br>
-                            &nbsp;&nbsp;"skill": "Elite problem-solving abilities"<br>
-                            }
-                        </span><br>
-                        
-                        <span class="terminal-command">$ git log --author="Otso" --pretty=format:"%h - %s"</span><span class="blink">_</span>
-                    </div>
-                </div>
-            </div>
         </div>
     </section>
     
     <section class="section" id="section2" data-depth="2">
         <h1>Projects</h1>
         
-        <div class="mystery-text text-reveal" style="--delay: 1">
-            <span class="highlight">Ideas materialized through code.</span> Each project represents a challenge overcome, a problem solved, and knowledge gained.
-        </div>
-        
         <div class="content-grid">
             <div class="grid-item" style="--delay: 2">
                 <div class="terminal-box">
                     <div class="terminal-content">
                         <span class="terminal-tag">
-                            <a href="https://github.com/OtsoBear/LatexToCalc" target="_blank" rel="noopener"> [LatexToCalc]</a>
+                            <a href="https://github.com/OtsoBear/LatexToCalc" target="_blank" rel="noopener">[LatexToCalc]</a>
                         </span><br>
                         <span class="terminal-output">
-                            Translates LaTeX code into formats usable by calculators in Finnish high schools<br>
+                            Translates LaTeX code into formats usable by calculators in Finnish high schools. Integrates seamlessly with the LatexToCalc Chrome extension for instant formula conversion.<br>
                             <br>
                             <span class="terminal-comment">// Backend</span><br>
                             Flask-based translation server<br>
@@ -743,29 +718,6 @@
                 </div>
             </div>
             
-            <div class="grid-item" style="--delay: 3">
-                <div class="terminal-box">
-                    <div class="terminal-content">
-                        <span class="terminal-tag">
-                            [AI Context Optimizer]
-                        </span><br>                        
-                        <span class="terminal-output">
-                            A production-ready API proxy with transparent, proprietary prompt compression.
-                            <br><br>
-                            <span class="terminal-comment">// Architecture</span><br>
-                            Catch-all universal proxy for multi-provider routing using a 5-tier auto-detection system. Includes direct handling of compressed data streams (gzip, brotli).
-                            <br><br>
-                            <span class="terminal-comment">// Backend & DB</span><br>
-                            Built on FastAPI & async SQLAlchemy 2.0 with a dual-schema usage tracking system and a custom singleton service layer.
-                            <br><br>
-                             <span class="terminal-comment">// Testing & Reliability</span><br>
-                            Architected for high reliability with a comprehensive Pytest suite, featuring transaction rollbacks and advanced async fixtures to ensure code quality.
-                        </span><br>
-                    </div>
-                </div>
-            </div>
-            
-
         </div>
     </section>
     
@@ -786,8 +738,6 @@
                             <span>LinkedIn: <a href="https://www.linkedin.com/in/otso-veistera" class="glowing-text" target="_blank">linkedin.com/in/otso-veistera</a></span><br>
                             <span>GitHub: <a href="https://github.com/OtsoBear" class="glowing-text" target="_blank">github.com/OtsoBear</a></span>
                         </span>
-                        <br>
-                        <span class="terminal-string">"Let's build something significant."</span><br>
                     </div>
                 </div>
             </div>
@@ -852,14 +802,14 @@
                 // Z-position is driven by the scroll accumulator and parallax
                 float zOffset = initialZ - (uScrollZ * parallaxFactor);
                 
-                // Longer travel distance for looping
-                float travelDistance = 4100.0;
+                // MUCH longer travel distance for continuous zooming experience
+                float travelDistance = 10000.0;
                 float loopedZ = mod(zOffset, travelDistance) - travelDistance / 2.0;
 
-                // CHANGE 2: Add lateral drift based on scroll position for a swirling effect
+                // CHANGE 2: Increased lateral drift for more swirling effect
                 vec3 animatedOffset = vec3(
-                    instanceOffset.x + (instanceDrift.x * uScrollZ * 0.01),
-                    instanceOffset.y + (instanceDrift.y * uScrollZ * 0.01),
+                    instanceOffset.x + (instanceDrift.x * uScrollZ * 0.02),
+                    instanceOffset.y + (instanceDrift.y * uScrollZ * 0.02),
                     loopedZ
                 );
                 
@@ -907,7 +857,7 @@
         }
 
         function createInstancedStars(isLowEndDevice) {
-            const totalStars = isLowEndDevice ? 1000 : 2000; // More stars for a denser field
+            const totalStars = isLowEndDevice ? 1000 : 8000; // Back to normal for low-end, dramatic for high-end
             const starGeometry = new THREE.PlaneGeometry(1, 1);
             const geometry = new THREE.InstancedBufferGeometry();
             geometry.index = starGeometry.index;
@@ -919,8 +869,8 @@
             const instanceScales = new Float32Array(totalStars);
             const parallaxFactors = new Float32Array(totalStars);
 
-            // CHANGE 3: Make the starfield much deeper
-            const bounds = { x: [-500, 500], y: [-350, 350], z: [-4000, 100] };
+            // CHANGE 3: Make the starfield MUCH deeper for more dramatic zoom
+            const bounds = { x: [-800, 800], y: [-600, 600], z: [-8000, 200] };
 
             for (let i = 0; i < totalStars; i++) {
                 const i3 = i * 3;
@@ -937,8 +887,8 @@
 
                 instanceScales[i] = isLowEndDevice ? Math.random() * 1.8 + 1.2 : Math.random() * 2.5 + 1.5;
                 
-                // CHANGE 4: Exaggerate the parallax for a more dramatic effect
-                parallaxFactors[i] = Math.random() * 0.8 + 0.2;
+                // CHANGE 4: DRAMATICALLY exaggerate parallax for extreme zoom effect
+                parallaxFactors[i] = Math.random() * 2.5 + 0.5; // Much higher range (0.5-3.0)
             }
 
             geometry.setAttribute('instanceOffset', new THREE.InstancedBufferAttribute(instanceOffsets, 3));
@@ -1006,8 +956,10 @@
                 let deltaY = scrollY - lastScrollY;
                 lastScrollY = scrollY;
                 
-                // Add the change in scroll to our velocity, with a sensitivity multiplier
-                scrollVelocity += deltaY * 0.02;
+                // Detect mobile for slower zoom
+                const isMobile = window.innerWidth < 900;
+                const scrollSensitivity = isMobile ? 0.04 : 0.08; // Slower on mobile
+                scrollVelocity += deltaY * scrollSensitivity;
 
                 const maxScroll = document.body.scrollHeight - window.innerHeight;
                 const scrollPercent = (scrollY / maxScroll) * 100;
@@ -1061,8 +1013,8 @@
                     // Update the accumulated position with the current velocity
                     scrollPositionAccumulator += scrollVelocity;
                     
-                    // Apply friction/decay to the velocity so it slows down smoothly
-                    scrollVelocity *= 0.95;
+                    // Reduced friction to maintain velocity longer for dramatic effect
+                    scrollVelocity *= 0.92;
 
                     // Update the shader with the accumulated position
                     instancedStars.material.uniforms.uScrollZ.value = scrollPositionAccumulator;
