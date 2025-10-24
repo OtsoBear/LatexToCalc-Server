@@ -1,6 +1,7 @@
 from flask import Flask, jsonify, request, send_from_directory, render_template, make_response
 from flask_cors import CORS
 from translatelatex import translate
+from docs_exporter_blueprint import docs_exporter_bp
 import logging
 from time import time
 from os import path, makedirs
@@ -8,6 +9,9 @@ import signal
 
 app = Flask(__name__)
 CORS(app)
+
+# Register docs-exporter blueprint
+app.register_blueprint(docs_exporter_bp)
 
 # Ensure the logs directory exists
 if not path.exists('logs'):
@@ -114,11 +118,6 @@ def serve_matrix_shaders_root(filename):
 @app.route('/static/<path:filename>')
 def serve_static(filename):
     return send_from_directory('static', filename)
-
-@app.route('/<path:filename>')
-def serve_file(filename):
-    # Serve files from the 'templates' directory
-    return send_from_directory(path.join('src', 'templates', 'reference', 'modules', 'ROOT'), filename)
 
 @app.route('/translate', methods=['POST', 'GET', 'OPTIONS'])
 @app.route('/translate/', methods=['POST', 'GET', 'OPTIONS'])
