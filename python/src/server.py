@@ -6,9 +6,19 @@ import logging
 from time import time
 from os import path, makedirs
 import signal
+import os
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv(dotenv_path=path.join(path.dirname(path.dirname(path.dirname(__file__))), '.env'))
 
 app = Flask(__name__)
 CORS(app)
+
+# Configure secret key for session management (required for flash messages)
+app.secret_key = os.environ.get('FLASK_SECRET_KEY')
+if not app.secret_key:
+    raise RuntimeError("FLASK_SECRET_KEY must be set in .env file. Generate one with: python3 -c 'import secrets; print(secrets.token_hex(32))'")
 
 # Register docs-exporter blueprint
 app.register_blueprint(docs_exporter_bp)

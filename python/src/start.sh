@@ -115,8 +115,9 @@ if [[ ! -x "$GUNICORN_PATH" ]]; then
     exit 1
 fi
 
-echo "Starting server on port $PORT with $WORKERS workers..."
-if ! "$GUNICORN_PATH" --limit-request-line 16384 -w $WORKERS -b 0.0.0.0:$PORT "$(basename "$MAIN_PY_PATH" .py):app"; then
+echo "Starting server on port $PORT with threading support for SSE..."
+# Use single worker with threads for SSE support (multiple workers don't share memory)
+if ! "$GUNICORN_PATH" --limit-request-line 16384 -w 1 --threads 8 --timeout 120 -b 0.0.0.0:$PORT "$(basename "$MAIN_PY_PATH" .py):app"; then
     echo "Failed to start the server."
     exit 1
 fi

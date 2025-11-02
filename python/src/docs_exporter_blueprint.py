@@ -504,26 +504,47 @@ def index():
 def progress_stream(progress_id):
     """Server-Sent Events endpoint for real-time progress updates"""
     def event_stream():
-        while True:
+        # Send initial heartbeat
+        yield f": heartbeat\n\n"
+        
+        last_data = None
+        retry_count = 0
+        max_retries = 120  # 60 seconds total (120 * 0.5s)
+        
+        while retry_count < max_retries:
             with progress_lock:
                 if progress_id in progress_data:
                     data = progress_data[progress_id]
-                    yield f"data: {json.dumps(data)}\n\n"
                     
-                    # Clean up completed progress
+                    # Only send if data changed or it's finished
+                    if data != last_data or data.get('finished', False):
+                        yield f"data: {json.dumps(data)}\n\n"
+                        last_data = data.copy()
+                    else:
+                        # Send heartbeat to keep connection alive
+                        yield f": heartbeat\n\n"
+                    
+                    # Clean up and close if finished
                     if data.get('finished', False):
-                        # Keep data for a bit longer so result page can access it
                         break
+                    
+                    retry_count = 0  # Reset retry count when data exists
                 else:
-                    yield f"data: {json.dumps({'error': 'Progress not found'})}\n\n"
-                    break
+                    # Progress not found yet, keep waiting
+                    retry_count += 1
+                    if retry_count >= max_retries:
+                        yield f"data: {json.dumps({'error': 'Progress not found', 'finished': True})}\n\n"
+                        break
+                    yield f": waiting\n\n"
+            
             time.sleep(0.5)  # Update every 500ms
     
-    return Response(event_stream(), mimetype="text/event-stream", headers={
-        'Cache-Control': 'no-cache',
-        'Connection': 'keep-alive',
-        'Access-Control-Allow-Origin': '*'
-    })
+    response = Response(event_stream(), mimetype="text/event-stream")
+    response.headers['Cache-Control'] = 'no-cache, no-transform'
+    response.headers['Connection'] = 'keep-alive'
+    response.headers['X-Accel-Buffering'] = 'no'  # Disable nginx buffering
+    response.headers['Access-Control-Allow-Origin'] = '*'
+    return response
 
 @docs_exporter_bp.route('/exporting')
 def exporting():
