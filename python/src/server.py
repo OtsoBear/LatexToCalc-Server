@@ -5,12 +5,18 @@ from docs_exporter_blueprint import docs_exporter_bp
 import logging
 from time import time
 from os import path, makedirs
-import signal
 import os
+import atexit
+from concurrent.futures import ThreadPoolExecutor, TimeoutError as FuturesTimeoutError
 from dotenv import load_dotenv
 
 # Load environment variables from .env file
 load_dotenv(dotenv_path=path.join(path.dirname(path.dirname(path.dirname(__file__))), '.env'))
+
+TRANSLATION_TIMEOUT = int(os.environ.get('TRANSLATION_TIMEOUT', '30'))
+TRANSLATION_WORKERS = int(os.environ.get('TRANSLATION_WORKERS', '4'))
+executor = ThreadPoolExecutor(max_workers=TRANSLATION_WORKERS)
+atexit.register(executor.shutdown, wait=False)
 
 app = Flask(__name__)
 CORS(app)
@@ -59,8 +65,13 @@ abbreviations = {
 class TimeoutError(Exception):
     pass
 
-def timeout_handler(_signum, _frame):  # Underscore prefix indicates intentionally unused parameters
-    raise TimeoutError("Translation timeout")
+def run_translation_with_timeout(expression, timeout, **settings):
+    future = executor.submit(translate, expression, **settings)
+    try:
+        return future.result(timeout=timeout)
+    except FuturesTimeoutError:
+        future.cancel()
+        raise TimeoutError("Translation timeout")
 
 # Serve all files in the 'templates' directory
 @app.route('/')
@@ -165,14 +176,7 @@ def translate_expression():
             # Create a string of active settings using the first letter of each setting name
             active_settings = " ".join([abbr for setting, abbr in abbreviations.items() if settings.get(setting, False)])
 
-            # Set timeout
-            signal.signal(signal.SIGALRM, timeout_handler)
-            signal.alarm(30)  # 30 second timeout
-            
-            try:
-                result = translate(expression, **settings)
-            finally:
-                signal.alarm(0)  # Cancel timeout
+            result = run_translation_with_timeout(expression, TRANSLATION_TIMEOUT, **settings)
             
             time_taken = (time() - start_time) * 1000
 

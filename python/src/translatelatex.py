@@ -1,5 +1,6 @@
 import re
 import regex
+import unicodedata
 
 class LatexToCalcEngine:
     """
@@ -1632,12 +1633,16 @@ class LatexToCalcEngine:
         def subscript_translator(content):
             def get_char_translation(char: str) -> str:
                 return indexDict.get(char, char)
-            
-            translated = ''.join(
-                subscript_digits[int(char)] if char.isdigit() else get_char_translation(char)
-                for char in content
-            )
-            return translated
+
+            translated_chars = []
+            for char in content:
+                try:
+                    digit_value = unicodedata.digit(char)
+                    translated_chars.append(subscript_digits[digit_value])
+                    continue
+                except (TypeError, ValueError):
+                    translated_chars.append(get_char_translation(char))
+            return ''.join(translated_chars)
 
         # Handle direct numeric subscripts (_3)
         digit_matches = list(re.finditer(digit_pattern, expression))
