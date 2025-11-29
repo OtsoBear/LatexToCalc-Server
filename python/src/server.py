@@ -1,6 +1,5 @@
 from flask import Flask, jsonify, request, send_from_directory, render_template, make_response
 from flask_cors import CORS
-from flask_wtf.csrf import CSRFProtect
 from translatelatex import translate
 from docs_exporter_blueprint import docs_exporter_bp
 import logging
@@ -22,16 +21,10 @@ atexit.register(executor.shutdown, wait=False)
 app = Flask(__name__)
 CORS(app)
 
-# Configure secret key for session management (required for flash messages)
+# Configure secret key for session management (required for flash messages in docs-exporter)
 app.secret_key = os.environ.get('FLASK_SECRET_KEY')
 if not app.secret_key:
     raise RuntimeError("FLASK_SECRET_KEY must be set in .env file. Generate one with: python3 -c 'import secrets; print(secrets.token_hex(32))'")
-
-# Initialize CSRF protection
-csrf = CSRFProtect(app)
-
-# Exempt docs-exporter blueprint from CSRF protection (it's an internal tool)
-csrf.exempt(docs_exporter_bp)
 
 # Register docs-exporter blueprint
 app.register_blueprint(docs_exporter_bp)
@@ -149,7 +142,6 @@ def serve_static(filename):
 
 @app.route('/translate', methods=['POST', 'GET', 'OPTIONS'])
 @app.route('/translate/', methods=['POST', 'GET', 'OPTIONS'])
-@csrf.exempt
 def translate_expression():
     if request.method == 'POST':
         # Handle POST requests (e.g., translating an expression)
