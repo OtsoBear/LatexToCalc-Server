@@ -149,6 +149,7 @@ def serve_static(filename):
 
 @app.route('/translate', methods=['POST', 'GET', 'OPTIONS'])
 @app.route('/translate/', methods=['POST', 'GET', 'OPTIONS'])
+@csrf.exempt
 def translate_expression():
     if request.method == 'POST':
         # Handle POST requests (e.g., translating an expression)
